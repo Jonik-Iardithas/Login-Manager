@@ -15,29 +15,37 @@ Folgende Dateien werden beim Installationsvorgang erstellt bzw. kopiert:
 Ini-Dateien:
 
 C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini
+
 C:\Users\%username%\AppData\Local\PowerShellTools\Backup-Maker\Settings.ini
 
 Verknüpfungen (optional):
 
 C:\Users\%username%\Desktop\Backup-Maker.lnk
+
 C:\Users\%username%\Desktop\Login-Manager.lnk
 
 C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk
+
 C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk
 
 C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Backup-Maker.lnk
+
 C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Uninstall (Backup-Maker).lnk
 
 Ordner mit Icons und Skript-Dateien:
 
 C:\Program Files\PowerShellTools\Login-Manager
+
 C:\Program Files\PowerShellTools\Login-Manager\Icons
+
 C:\Program Files\PowerShellTools\Backup-Maker
+
 C:\Program Files\PowerShellTools\Backup-Maker\Icons
 
 Um dem Ganzen einen etwas moderneren Look zu verpassen, habe ich optionale Icons beigefügt, die nach Wunsch manuell in das entsprechende Icon-Verzeichnis kopiert werden können. Dieses findet sich standardmäßig unter
 
 C:\Program Files\PowerShellTools\Login-Manager\Icons
+
 C:\Program Files\PowerShellTools\Backup-Maker\Icons
 
 Lediglich das erste Zip-Archiv muss entpackt werden, anschließend die Datei Install.ps1 mittels rechter Maustaste und "Mit PowerShell ausführen" starten.
