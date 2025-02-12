@@ -1,4 +1,4 @@
-Hallo Welt,
+**Hallo Welt,**
 
 ich verbrachte den Sommer 2024 größtenteils damit, zwei Anwendungen in Powershell zu schreiben. Die Ideen zu diesem Projekt begleiteten mich schon eine Weile, doch erst zu dieser Zeit fand ich den passenden Einstieg. Eine Anwendung sollte die Verschlüsselung von Login-Daten zum Gegenstand haben, die andere sollte inkrementelle Backups erstellen. Ich merkte relativ bald, dass es sich bei diesen Projekten um mehr als um Skripte handelte, ganz unverhofft betrat ich das Feld der Anwendungsentwicklung. Von den Ergebnissen bin ich gänzlich überzeugt und ich persönlich nutze meine Programme seitdem täglich. Aus diesem Grund würde ich meine Arbeiten gerne mit sovielen Nutzern wie möglich teilen. Darüberhinaus können die Skripte als Referenzwerke für Powershell-Lernende dienen, sind sie doch sehr geradeaus geschrieben.
 
@@ -12,7 +12,7 @@ Beide Anwendungen erfordern eine gewisse Dateistruktur um zu laufen, weshalb ich
 
 Um dem Ganzen einen etwas moderneren Look zu verpassen, habe ich optionale Icons beigefügt, die nach Wunsch manuell in das entsprechende Icon-Verzeichnis kopiert werden können. Dieses findet sich standardmäßig unter
 
-`C:\Program Files\PowerShellTools\Login-Manager\Icons`
+`C:\Program Files\PowerShellTools\Login-Manager\Icons`\
 `C:\Program Files\PowerShellTools\Backup-Maker\Icons`
 
 Lediglich das erste Zip-Archiv muss entpackt werden, anschließend die Datei Install.ps1 mittels rechter Maustaste und "Mit PowerShell ausführen" starten.
