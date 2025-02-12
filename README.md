@@ -21,13 +21,13 @@ Noch eine technische Bemerkung: In meinen Skripten mache ich exzessiven Gebrauch
 
 Abschließend noch ein Hinweis in eigener Sache: Ich bin lediglich ein autodidaktischer Hobby-Programmierer und kein professioneller Anwendungsentwickler. Aus diesem Grund bitte ich darum, mich mit Nachsicht zu behandeln.
 
----
+-
 
 Folgende Dateien werden beim Installationsvorgang erstellt bzw. kopiert:
 
 Ini-Dateien:
 
-`C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini`
+`C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini`\
 `C:\Users\%username%\AppData\Local\PowerShellTools\Backup-Maker\Settings.ini`
 
 Verknüpfungen (optional):
