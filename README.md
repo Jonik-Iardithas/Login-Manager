@@ -21,7 +21,7 @@ Noch eine technische Bemerkung: In meinen Skripten mache ich exzessiven Gebrauch
 
 Abschließend noch ein Hinweis in eigener Sache: Ich bin lediglich ein autodidaktischer Hobby-Programmierer und kein professioneller Anwendungsentwickler. Aus diesem Grund bitte ich darum, mich mit Nachsicht zu behandeln.
 
--
+--
 
 Folgende Dateien werden beim Installationsvorgang erstellt bzw. kopiert:
 
@@ -32,18 +32,18 @@ Ini-Dateien:
 
 Verknüpfungen (optional):
 
-`C:\Users\%username%\Desktop\Backup-Maker.lnk`
+`C:\Users\%username%\Desktop\Backup-Maker.lnk`\
 `C:\Users\%username%\Desktop\Login-Manager.lnk`
 
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk`
+`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk`\
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk`
 
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Backup-Maker.lnk`
+`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Backup-Maker.lnk`\
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Uninstall (Backup-Maker).lnk`
 
 Ordner mit Icons und Skript-Dateien:
 
-`C:\Program Files\PowerShellTools\Login-Manager`
-`C:\Program Files\PowerShellTools\Login-Manager\Icons`
-`C:\Program Files\PowerShellTools\Backup-Maker`
+`C:\Program Files\PowerShellTools\Login-Manager`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons`\
+`C:\Program Files\PowerShellTools\Backup-Maker`\
 `C:\Program Files\PowerShellTools\Backup-Maker\Icons`
