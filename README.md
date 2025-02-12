@@ -17,7 +17,7 @@ Um dem Ganzen einen etwas moderneren Look zu verpassen, habe ich optionale Icons
 
 **Installationsanleitung:**
 
-Das komplette Archiv unter `Zip/ALL/` herunterladen und entpacken, so dass die Datei `Install.ps1` sowie das dazugehörige Zip-Archiv vorhanden sind. Anschließend die Datei `Install.ps1` mittels rechter Maustaste und *Mit PowerShell ausführen* starten.
+Das komplette Archiv unter `Zip/ALL/` herunterladen und entpacken, so dass die Datei `Install.ps1` sowie das dazugehörige Zip-Archiv vorhanden sind. Anschließend die Datei `Install.ps1` mittels rechter Maustaste und *"Mit PowerShell ausführen"* starten.
 
 Noch eine technische Bemerkung: In meinen Skripten mache ich exzessiven Gebrauch von der `+=` Methode! Mir ist die fortlaufende Diskussion um dieses Thema bewusst. Nur soviel dazu: Ich benutze Windows Powershell 5.1 und konnte beim Programmieren keinerlei Performance-Einbrüche aufgrund dieser Methode feststellen. Es verhielt sich vielmehr so, dass andere, teils hochgelobte Alternativen zu messbaren Einbrüchen der Performance geführt haben. Wer sich also von der `+=` Methode auf den Schlips getreten fühlt, sollte meine Skripte meiden (oder Fliege tragen).
 
