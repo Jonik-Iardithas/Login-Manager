@@ -49,3 +49,9 @@ Ordner mit Icons und Skript-Dateien:
 `C:\Program Files\PowerShellTools\Login-Manager\Icons`\
 `C:\Program Files\PowerShellTools\Backup-Maker`\
 `C:\Program Files\PowerShellTools\Backup-Maker\Icons`
+
+---
+
+![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Login-Manager.png)
+<br>
+![Backup-Maker_Screenshot](https://github.com/Jonik-Iardithas/Backup-Maker/blob/main/Img/Backup-Maker.png)
