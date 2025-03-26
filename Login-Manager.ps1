@@ -239,12 +239,24 @@ function Create-Icons ([string]$Name, [HashTable]$List, [string]$Path)
 
 # -------------------------------------------------------------
 
-function Write-Msg ([bool]$NL, [bool]$Time, [string]$Msg, [bool]$Addd)
+function Write-Msg ([object]$TextBox, [bool]$NL, [bool]$Time, [string]$Msg, [string]$Addd)
     {
-        If ($NL) {$NLTime = [System.Environment]::NewLine}
-        If ($Time) {$NLTime += [string](Get-Date -Format "HH:mm:ss") + " "}
-        If ($Addd) {$Addendum = " " + [string]$Global:Result.Count + " " + $Msg_List.Addendum }
-        $tb_Events.AppendText($NLTime + $Msg + $Addendum)
+        If ($NL)
+            {
+                $NLTime = [System.Environment]::NewLine
+            }
+
+        If ($Time)
+            {
+                $NLTime += [string](Get-Date -Format "HH:mm:ss") + " "
+            }
+
+        If ($Addd)
+            {
+                $Msg += " " + [string]$Global:Result.Count + " " + $Addd
+            }
+
+        $TextBox.AppendText($NLTime + $Msg)
     }
 
 # -------------------------------------------------------------
@@ -292,7 +304,7 @@ function Load-Result ([string]$Msg_A, [string]$Msg_B)
                         $bt_Prev.Enabled = $true
                         $bt_Next.Enabled = $true
                     }
-                If ($Msg_A) {Write-Msg -NL $true -Time $true -Msg $Msg_A -Addd $true}
+                If ($Msg_A) {Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_A -Addd $Msg_List.Addendum}
             }
         Else
             {
@@ -314,7 +326,7 @@ function Load-Result ([string]$Msg_A, [string]$Msg_B)
                 $bt_Edit.Enabled = $false
                 $bt_Prev.Enabled = $false
                 $bt_Next.Enabled = $false
-                If ($Msg_B) {Write-Msg -NL $true -Time $true -Msg $Msg_B -Addd $true}
+                If ($Msg_B) {Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_B -Addd $Msg_List.Addendum}
             }
 
         $Form.ActiveControl = $pn_Panel
@@ -368,11 +380,11 @@ $ar_Events = @(
                     {
                         $this.TopMost = $true
                         $this.ActiveControl = $pn_Panel
-                        Write-Msg -NL $false -Time $true -Msg $Msg_List.Start
+                        Write-Msg -TextBox $tb_Events -NL $false -Time $true -Msg $Msg_List.Start
                         If (!(Test-Path -Path $Paths.LoginFile))
                             {
                                 New-Item -Path $Paths.LoginFile -Force
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoLogins
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
                     })}
                 {Add_FormClosing({Set-Clipboard -Value $null})}
@@ -517,16 +529,16 @@ $ar_Events = @(
                                                                     })
                                         $Data | ConvertTo-Json -depth 1 | Set-Content -Path $Paths.LoginFile
                                         Clear-Boxes
-                                        Write-Msg -NL $true -Time $true -Msg $Msg_List.NewRecord
+                                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NewRecord
                                     }
                                 Else
                                     {
-                                        Write-Msg -NL $true -Time $true -Msg $Msg_List.FailRecord
+                                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.FailRecord
                                     }
                             }
                         Else
                             {
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoLogins
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
                     })}
               )
@@ -569,17 +581,17 @@ $ar_Events = @(
                                             }
                                         Else
                                             {
-                                                Write-Msg -NL $true -Time $true -Msg $Msg_List.CancelEdit
+                                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CancelEdit
                                             }
                                     }
                                 Else
                                     {
-                                        Write-Msg -NL $true -Time $true -Msg $Msg_List.FailEdit
+                                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.FailEdit
                                     }
                             }
                         Else
                             {
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoLogins
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
                     })}
               )
@@ -620,7 +632,7 @@ $ar_Events = @(
                             }
                         Else
                             {
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoLogins
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
                     })}
               )
@@ -659,7 +671,7 @@ $ar_Events = @(
                 {Add_Click(
                     {
                         Set-Clipboard -Value $this.Text
-                        Write-Msg -NL $true -Time $true -Msg $Msg_List.CopyClipboard
+                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CopyClipboard
                     })}
                 {Add_MouseHover(
                     {
@@ -739,12 +751,12 @@ $ar_Events = @(
                                     }
                                 Else
                                     {
-                                        Write-Msg -NL $true -Time $true -Msg $Msg_List.CancelDelete
+                                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CancelDelete
                                     }
                             }
                         Else
                             {
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoLogins
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
                     })}
               )
@@ -891,7 +903,7 @@ $ar_Events = @(
                         If (!(Test-Path -Path $Paths.UserDataFile))
                             {
                                 New-Item -Path $Paths.UserDataFile -Force
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.NoUserData
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoUserData
                             }
                     })}
                 {Add_FormClosed({$Form.TopMost = $true})}
@@ -972,17 +984,17 @@ $ar_Events = @(
                                     $tb_Metadata.Enabled = $true
                                     $bt_Metadata.Enabled = $true
                                     $bt_MPW.Enabled = $false
-                                    Write-Msg -NL $true -Time $true -Msg $Msg_List.EnterMPW
+                                    Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.EnterMPW
                                     $MPW_Form.Close()
                                 }
                                 Else
                                 {
-                                    Write-Msg -NL $true -Time $true -Msg $Msg_List.WrongMPW
+                                    Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.WrongMPW
                                 }
                             }
                         Else
                             {
-                                Write-Msg -NL $true -Time $true -Msg $Msg_List.ShortMPW
+                                Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.ShortMPW
                             }
                     })}
               )
@@ -1229,7 +1241,7 @@ $ar_Events = @(
                 {Add_Click(
                     {
                         Set-Clipboard -Value $this.Text
-                        Write-Msg -NL $true -Time $true -Msg $Msg_List.CopyClipboard
+                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CopyClipboard
                     })}
                 {Add_MouseHover(
                     {
@@ -1299,7 +1311,7 @@ $ar_Events = @(
 
                         $tb_r_Generator.Enabled = $true
                         $tb_r_Generator.Text = $Str
-                        Write-Msg -NL $true -Time $true -Msg $Msg_List.CreatePW
+                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CreatePW
                     })}
               )
 
@@ -1389,7 +1401,7 @@ $ar_Events = @(
                 {Add_Click(
                     {
                         Set-Clipboard -Value $this.Text
-                        Write-Msg -NL $true -Time $true -Msg $Msg_List.CopyClipboard
+                        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CopyClipboard
                     })}
                 {Add_MouseHover(
                     {
