@@ -15,10 +15,10 @@ $FontSize = 9
 $FontStyle = [System.Drawing.FontStyle]::Regular
 $FormColor = [System.Drawing.Color]::LightSteelBlue
 $TextBoxColor = [System.Drawing.Color]::Ivory
-$ButtonSizeA = New-Object System.Drawing.Size(80,40)
-$ButtonSizeB = New-Object System.Drawing.Size(340,30)
-$ButtonSizeC = New-Object System.Drawing.Size(100,30)
-$ButtonSizeD = New-Object System.Drawing.Size(20,20)
+$ButtonSizeA = [System.Drawing.Size]::new(80,40)
+$ButtonSizeB = [System.Drawing.Size]::new(340,30)
+$ButtonSizeC = [System.Drawing.Size]::new(100,30)
+$ButtonSizeD = [System.Drawing.Size]::new(20,20)
 $ButtonColorC = [System.Drawing.Color]::LightCyan
 $ButtonColorD = [System.Drawing.Color]::LightSteelBlue
 $PanelColor = [System.Drawing.Color]::SteelBlue
@@ -28,8 +28,11 @@ $Global:ID = $null
 $Global:Result = $null
 $Global:Index = $null
 $Global:MPW = $null
+$Global:Count = [System.TimeSpan]::FromSeconds(900)
 $L_Ptr = [System.IntPtr]::new(0)
 $S_Ptr = [System.IntPtr]::new(0)
+$SyncHash = [HashTable]::Synchronized(@{Counter = $Global:Count})
+$RSNames = @("Timer","CleanUp")
 
 $Msg_List = @{
     Start         = "Login-Manager gestartet."
@@ -50,6 +53,52 @@ $Msg_List = @{
     ShortMPW      = "Das Master-Passwort muss mindestens 16 Zeichen betragen."
     CreatePW      = "Passwort generiert."
     Addendum      = "Datensätze gefunden."
+}
+
+$Texts_List = @{
+    Form              = "Login-Manager"
+    Edit_Form         = "Änderungsbestätigung"
+    Del_Form          = "Löschbestätigung"
+    MPW_Form          = "Master-Passwort eingeben"
+    PW_Generator_Form = "Passwort-Generator"
+    Metadata_Form     = "Metadaten"
+    lb_URL            = "URL"
+    lb_UserName       = "Benutzername"
+    lb_Email          = "Email-Adresse"
+    lb_Password       = "Passwort"
+    lb_Metadata       = "Metadaten"
+    lb_Events         = "Ereignisse"
+    lb_MPW            = "Master-Passwort"
+    lb_Edit           = "Datensatz wird überschrieben. Fortfahren?"
+    lb_Del            = "Datensatz wird unwiderruflich gelöscht. Fortfahren?"
+    lb_Config         = "Konfiguration"
+    lb_Exclusions     = "Ausschlüsse"
+    lb_Chars          = "{0} Zeichen"
+    tb_r_URL          = "[URL]"
+    tb_r_UserName     = "[Benutzername]"
+    tb_r_Email        = "[Email-Adresse]"
+    tb_r_Password     = "[Passwort]"
+    tb_r_Metadata     = "[Metadaten]"
+    bt_MPW            = "Master-Passwort"
+    bt_Edit_OK        = "Ja"
+    bt_Edit_Cancel    = "Nein"
+    bt_Del_OK         = "Ja"
+    bt_Del_Cancel     = "Nein"
+    bt_PW_Create      = "Erstellen"
+    bt_PW_Close       = "Schließen"
+    bt_Metadata_Close = "Schließen"
+    bt_Chars_Minus    = "{0} Zeichen"
+    bt_Chars_Plus     = "{0} Zeichen"
+}
+
+$Tooltips_List = @{
+    Copy  = "Klicken um Inhalt in die Zwischenablage zu kopieren."
+    Reset = "Klicken um Timer zurückzusetzen."
+}
+
+$MessageBoxes_List = @{
+    Initialize_Msg_01 = "Konnte Datei {0} nicht finden."
+    Initialize_Msg_02 = "Login-Manager: Fehler"
 }
 
 $Icons_List = @{
@@ -89,7 +138,7 @@ function Initialize-Me ([string]$FilePath)
     {
         If (!(Test-Path -Path $FilePath))
             {
-                [System.Windows.Forms.MessageBox]::Show("Konnte Datei `"$FilePath`" nicht finden.","Login-Manager: Fehler",0)
+                [System.Windows.Forms.MessageBox]::Show(($MessageBoxes_List.Initialize_Msg_01 -f $FilePath),$MessageBoxes_List.Initialize_Msg_02,0)
                 Exit
             }
 
@@ -98,6 +147,95 @@ function Initialize-Me ([string]$FilePath)
         ForEach ($i in $Data) {$ht_Result += @{$i.Split("=")[0].Trim(" ") = $i.Split("=")[-1].Trim(" ")}}
 
         return $ht_Result
+    }
+
+# -------------------------------------------------------------
+
+function Clean-Up ([array]$RSNames)
+    {
+        If (Get-Runspace -Name $RSNames[-1]) {return}
+
+        $Runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
+        $Runspace.ApartmentState = "STA"
+        $Runspace.ThreadOptions = "ReuseThread"
+        $Runspace.Name = $RSNames[-1]
+        $Runspace.Open()
+        $Runspace.SessionStateProxy.SetVariable("RSNames", $RSNames)
+        
+        $PSInstance = [System.Management.Automation.PowerShell]::Create().AddScript(
+            {
+                While ($true)
+                    {
+                        $RS = Get-Runspace -Name $RSNames
+                        ForEach($i in $RS)
+                            {
+                                If ($i.RunspaceAvailability -eq 'Available')
+                                    {
+                                        $i.Dispose()
+                                        [System.GC]::Collect()
+                                    }
+                            }
+                        Start-Sleep -Milliseconds 100
+                    }
+            })
+
+        $PSInstance.Runspace = $Runspace
+        $PSInstance.BeginInvoke()
+    }
+
+# -------------------------------------------------------------
+
+function Simulate-Timer ([HashTable]$SyncHash, [array]$RSNames)
+    {
+        If (Get-Runspace -Name $RSNames[0]) {return}
+
+        $Runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
+        $Runspace.ApartmentState = "STA"
+        $Runspace.ThreadOptions = "ReuseThread"
+        $Runspace.Name = $RSNames[0]
+        $Runspace.Open()
+        $Runspace.SessionStateProxy.SetVariable("SyncHash", $SyncHash)
+        $Runspace.SessionStateProxy.SetVariable("RSNames", $RSNames)
+        
+        $PSInstance = [System.Management.Automation.PowerShell]::Create().AddScript(
+            {
+                While ($SyncHash.Counter.TotalSeconds -ge 0) {
+                        $SyncHash.lb_Counter.Text = "{0:D2}:{1:D2}" -f $SyncHash.Counter.Minutes, $SyncHash.Counter.Seconds
+                        $SyncHash.Counter = $SyncHash.Counter.Subtract([System.TimeSpan]::FromSeconds(1))
+                        Start-Sleep -Seconds 1
+                    }
+
+                If ($SyncHash.MPW_Form.Visible)
+                    {
+                        $SyncHash.MPW_Form.Activate()
+                        $SyncHash.MPW_Form.Close()                    
+                    }
+                If ($SyncHash.Edit_Form.Visible)
+                    {
+                        $SyncHash.Edit_Form.Activate()
+                        $SyncHash.Edit_Form.Close()
+                    }
+                If ($SyncHash.Del_Form.Visible)
+                    {
+                        $SyncHash.Del_Form.Activate()
+                        $SyncHash.Del_Form.Close()
+                    }
+                If ($SyncHash.PW_Generator_Form.Visible)
+                    {
+                        $SyncHash.PW_Generator_Form.Activate()
+                        $SyncHash.PW_Generator_Form.Close()
+                    }
+                If ($SyncHash.Metadata_Form.Visible)
+                    {
+                        $SyncHash.Metadata_Form.Activate()
+                        $SyncHash.Metadata_Form.Close()
+                    }
+
+                (Get-Process -Id $PID).CloseMainWindow()
+            })
+
+        $PSInstance.Runspace = $Runspace
+        $PSInstance.BeginInvoke()
     }
 
 # -------------------------------------------------------------
@@ -310,12 +448,12 @@ function Load-Result ([string]$Msg_A, [string]$Msg_B)
             {
                 $Global:ID = $null
                 $Global:Index = $null
-                $tb_r_URL.Text = "[URL]"
-                $tb_r_UserName.Text = "[Benutzername]"
-                $tb_r_Email.Text = "[Emailadresse]"
-                $tb_r_Password.Text = "[Passwort]"
+                $tb_r_URL.Text = $Texts_List.tb_r_URL
+                $tb_r_UserName.Text = $Texts_List.tb_r_UserName
+                $tb_r_Email.Text = $Texts_List.tb_r_Email
+                $tb_r_Password.Text = $Texts_List.tb_r_Password
                 $tb_r_Password.UseSystemPasswordChar = $false
-                $tb_r_Metadata.Text = "[Metadaten]"
+                $tb_r_Metadata.Text = $Texts_List.tb_r_Metadata
                 $lb_Page.Text = "- / -"
                 $tb_r_URL.Enabled = $false
                 $tb_r_UserName.Enabled = $false
@@ -366,10 +504,10 @@ $ButtonSizeA.Height = $IconMax.Height + 8
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = [System.Drawing.Size]::new(400,(600 + ($IconMax.Height + 8) * 3))
+            ClientSize = [System.Drawing.Size]::new(400,(640 + ($IconMax.Height + 8) * 3))
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Login-Manager"
+            Text = $Texts_List.Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -386,8 +524,23 @@ $ar_Events = @(
                                 New-Item -Path $Paths.LoginFile -Force
                                 Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
+                        Clean-Up -RSNames $RSNames
+                        Simulate-Timer -SyncHash $SyncHash -RSNames $RSNames
                     })}
-                {Add_FormClosing({Set-Clipboard -Value $null})}
+                {Add_FormClosing(
+                    {
+                        Set-Clipboard -Value $null
+                        $this.Cursor = [System.Windows.Forms.Cursors]::WaitCursor
+                        $this.Text += " (Closing...)"
+                        Start-Sleep -Seconds 1
+
+                        $RS = Get-Runspace -Name $RSNames
+                        ForEach($i in $RS)
+                            {
+                                $i.Dispose()
+                                [System.GC]::Collect()
+                            }
+                    })}
               )
 
 Create-Object -Name Form -Type Form -Data $ht_Data -Events $ar_Events
@@ -397,10 +550,12 @@ Create-Object -Name Form -Type Form -Data $ht_Data -Events $ar_Events
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,10)
-            Size = New-Object System.Drawing.Size(($Form.ClientSize.Width - 20),20)
-            Text = "URL"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = 10
+            Width = $Form.ClientSize.Width - 20
+            Height = 20
+            Text = $Texts_List.lb_URL
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -408,22 +563,22 @@ Create-Object -Name lb_URL -Type Label -Data $ht_Data -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
-$ht_Data.Text = "Benutzername"
+$ht_Data.Top += 50
+$ht_Data.Text = $Texts_List.lb_UserName
 
 Create-Object -Name lb_UserName -Type Label -Data $ht_Data -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
-$ht_Data.Text = "Emailadresse"
+$ht_Data.Top += 50
+$ht_Data.Text = $Texts_List.lb_Email
 
 Create-Object -Name lb_Email -Type Label -Data $ht_Data -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
-$ht_Data.Text = "Passwort"
+$ht_Data.Top += 50
+$ht_Data.Text = $Texts_List.lb_Password
 
 Create-Object -Name lb_Password -Type Label -Data $ht_Data -Control Form
 
@@ -432,9 +587,11 @@ Create-Object -Name lb_Password -Type Label -Data $ht_Data -Control Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,($lb_URL.Bounds.Bottom))
-            Size = New-Object System.Drawing.Size(($Form.ClientSize.Width - 20),20)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 10
+            Top = $lb_URL.Bounds.Bottom
+            Width = $Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::IBeam
             Enabled = $false
@@ -473,19 +630,19 @@ Create-Object -Name tb_URL -Type TextBox -Data $ht_Data -Events $ar_Events -Cont
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
+$ht_Data.Top += 50
 
 Create-Object -Name tb_UserName -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
+$ht_Data.Top += 50
 
 Create-Object -Name tb_Email -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 50
+$ht_Data.Top += 50
 
 Create-Object -Name tb_Password -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
@@ -494,7 +651,8 @@ Create-Object -Name tb_Password -Type TextBox -Data $ht_Data -Events $ar_Events 
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(30,($tb_Password.Bounds.Bottom + 10))
+            Left = 30
+            Top = $tb_Password.Bounds.Bottom + 10
             Size = $ButtonSizeA
             Image = $Icons.Add
             ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
@@ -547,7 +705,7 @@ Create-Object -Name bt_Add -Type Button -Data $ht_Data -Events $ar_Events -Contr
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
+$ht_Data.Left = $Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
 $ht_Data.Image = $Icons.Edit
 
 $ar_Events = @(
@@ -600,7 +758,7 @@ Create-Object -Name bt_Edit -Type Button -Data $ht_Data -Events $ar_Events -Cont
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Form.ClientSize.Width - $ButtonSizeA.Width - 30
+$ht_Data.Left = $Form.ClientSize.Width - $ButtonSizeA.Width - 30
 $ht_Data.Image = $Icons.Find
 
 $ar_Events = @(
@@ -644,8 +802,10 @@ Create-Object -Name bt_Find -Type Button -Data $ht_Data -Events $ar_Events -Cont
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,($bt_Add.Bounds.Bottom + 10))
-            Size = New-Object System.Drawing.Size(($Form.ClientSize.Width - 20),140)
+            Left = 10
+            Top = $bt_Add.Bounds.Bottom + 10
+            Width = $Form.ClientSize.Width - 20
+            Height = 140
             BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
             }
 
@@ -656,12 +816,14 @@ Create-Object -Name pn_Panel -Type Panel -Data $ht_Data -Control Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(20,($pn_Panel.Bounds.Top + 10))
-            Size = New-Object System.Drawing.Size(($pn_Panel.ClientSize.Width - 20),20)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 20
+            Top = $pn_Panel.Bounds.Top + 10
+            Width = $pn_Panel.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::Hand
-            Text = "[URL]"
+            Text = $Texts_List.tb_r_URL
             TextAlign = [System.Windows.Forms.HorizontalAlignment]::Center
             Enabled = $false
             ReadOnly = $true
@@ -675,7 +837,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,"Klicken um Inhalt in die Zwischenablage zu kopieren.")
+                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
                     })}
               )
 
@@ -683,22 +845,22 @@ Create-Object -Name tb_r_URL -Type TextBox -Data $ht_Data -Events $ar_Events -Co
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 30
-$ht_Data.Text = "[Benutzername]"
+$ht_Data.Top += 30
+$ht_Data.Text = $Texts_List.tb_r_UserName
 
 Create-Object -Name tb_r_UserName -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 30
-$ht_Data.Text = "[Emailadresse]"
+$ht_Data.Top += 30
+$ht_Data.Text = $Texts_List.tb_r_Email
 
 Create-Object -Name tb_r_Email -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 30
-$ht_Data.Text = "[Passwort]"
+$ht_Data.Top += 30
+$ht_Data.Text = $Texts_List.tb_r_Password
 
 Create-Object -Name tb_r_Password -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
@@ -707,14 +869,18 @@ Create-Object -Name tb_r_Password -Type TextBox -Data $ht_Data -Events $ar_Event
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(($Form.ClientSize.Width / 2 - 40),($tb_r_Password.Bounds.Bottom + 3))
-            Size = New-Object System.Drawing.Size(80,26)
+            Left = $Form.ClientSize.Width / 2 - 40
+            Top = $tb_r_Password.Bounds.Bottom + 3
+            Width = 80
+            Height = 26
             Text = "- / -"
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             }
 
 Create-Object -Name lb_Page -Type Label -Data $ht_Data -Control Form
+
+# -------------------------------------------------------------
 
 $pn_Panel.SendToBack()
 
@@ -723,7 +889,8 @@ $pn_Panel.SendToBack()
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($Form.ClientSize.Width / 2) - ($ButtonSizeA.Width / 2)),($pn_Panel.Bounds.Bottom + 15))
+            Left = $Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
+            Top = $pn_Panel.Bounds.Bottom + 15
             Size = $ButtonSizeA
             Image = $Icons.Del
             ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
@@ -765,7 +932,7 @@ Create-Object -Name bt_Del -Type Button -Data $ht_Data -Events $ar_Events -Contr
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = 30
+$ht_Data.Left = 30
 $ht_Data.Image = $Icons.Prev
 
 $ar_Events = @(
@@ -780,7 +947,7 @@ Create-Object -Name bt_Prev -Type Button -Data $ht_Data -Events $ar_Events -Cont
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Form.ClientSize.Width - 30 - $ButtonSizeA.Width
+$ht_Data.Left = $Form.ClientSize.Width - 30 - $ButtonSizeA.Width
 $ht_Data.Image = $Icons.Next
 
 $ar_Events = @(
@@ -796,10 +963,11 @@ Create-Object -Name bt_Next -Type Button -Data $ht_Data -Events $ar_Events -Cont
 # -------------------------------------------------------------
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($Form.ClientSize.Width / 2) - ($ButtonSizeB.Width / 2)),($bt_Next.Bounds.Bottom + 10))
+            Left = $Form.ClientSize.Width / 2 - $ButtonSizeB.Width / 2
+            Top = $bt_Next.Bounds.Bottom + 10
             Size = $ButtonSizeB
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = "Master-Passwort"
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.bt_MPW
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
             Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -812,7 +980,8 @@ Create-Object -Name bt_MPW -Type Button -Data $ht_Data -Events $ar_Events -Contr
 # -------------------------------------------------------------
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(30,($bt_MPW.Bounds.Bottom + 10))
+            Left = 30
+            Top = $bt_MPW.Bounds.Bottom + 10
             Size = $ButtonSizeA
             Image = $Icons.PW_Generator
             ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
@@ -827,7 +996,7 @@ Create-Object -Name bt_PW_Generator -Type Button -Data $ht_Data -Events $ar_Even
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
+$ht_Data.Left = $Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
 $ht_Data.Image = $Icons.Metadata
 $ht_Data += @{Enabled = $false}
 
@@ -837,11 +1006,13 @@ Create-Object -Name bt_Metadata -Type Button -Data $ht_Data -Events $ar_Events -
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Form.ClientSize.Width - $ButtonSizeA.Width - 30
+$ht_Data.Left = $Form.ClientSize.Width - $ButtonSizeA.Width - 30
 $ht_Data.Image = $Icons.Exit
 $ht_Data.Enabled = $true
 
-Create-Object -Name bt_Exit -Type Button -Data $ht_Data -Control Form
+$ar_Events = @({Add_Click({$SyncHash.Counter = [System.TimeSpan]::Zero})})
+
+Create-Object -Name bt_Exit -Type Button -Data $ht_Data -Events $ar_Events -Control Form
 
 $Form.CancelButton = $bt_Exit
 
@@ -850,10 +1021,12 @@ $Form.CancelButton = $bt_Exit
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,($bt_Exit.Bounds.Bottom + 10))
-            Size = New-Object System.Drawing.Size(($Form.ClientSize.Width - 20),20)
-            Text = "Ereignisse"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = $bt_Exit.Bounds.Bottom + 10
+            Width = $Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Events
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -864,9 +1037,11 @@ Create-Object -Name lb_Events -Type Label -Data $ht_Data -Control Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,$lb_Events.Bounds.Bottom)
-            Size = New-Object System.Drawing.Size(($Form.ClientSize.Width - 20),($Form.ClientSize.Height - $lb_Events.Bounds.Bottom - 10))
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 10
+            Top = $lb_Events.Bounds.Bottom
+            Width = $Form.ClientSize.Width - 20
+            Height = 130
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::IBeam
             Multiline = $true
@@ -878,14 +1053,48 @@ $ht_Data = @{
 Create-Object -Name tb_Events -Type TextBox -Data $ht_Data -Control Form
 
 # =============================================================
+# ========== Form: Labels =====================================
+# =============================================================
+
+$ht_Data = @{
+            Width = 120
+            Height = 22
+            Left = ($Form.ClientSize.Width - 120) / 2
+            Top = $tb_Events.Bounds.Bottom + 13
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, [System.Drawing.FontStyle]::Bold)
+            ForeColor = [System.Drawing.Color]::Red
+            BackColor = [System.Drawing.Color]::White
+            BorderStyle = [System.Windows.Forms.BorderStyle]::Fixed3D
+            TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+            Cursor = [System.Windows.Forms.Cursors]::Hand
+            }
+
+$ar_Events = @(
+                {Add_Click(
+                    {
+                        $SyncHash.Counter = $Global:Count
+                    })}
+                {Add_MouseHover(
+                    {
+                        $Tooltip.SetToolTip($this,$Tooltips_List.Reset)
+                    })}
+                )
+
+Create-Object -Name lb_Counter -Type Label -Data $ht_Data -Events $ar_Events -Control Form
+
+# -------------------------------------------------------------
+
+$SyncHash.lb_Counter = $lb_Counter
+
+# =============================================================
 # ========== MPW_Form =========================================
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = New-Object System.Drawing.Size(400,120)
+            ClientSize = [System.Drawing.Size]::new(400,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Master-Passwort eingeben"
+            Text = $Texts_List.MPW_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             KeyPreview = $true
@@ -911,15 +1120,21 @@ $ar_Events = @(
 
 Create-Object -Name MPW_Form -Type Form -Data $ht_Data -Events $ar_Events
 
+# -------------------------------------------------------------
+
+$SyncHash.MPW_Form = $MPW_Form
+
 # =============================================================
 # ========== MPW_Form: Labels =================================
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,10)
-            Size = New-Object System.Drawing.Size(($MPW_Form.ClientSize.Width - 20),20)
-            Text = "Master-Passwort"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = 10
+            Width = $MPW_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_MPW
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -930,9 +1145,11 @@ Create-Object -Name lb_MPW -Type Label -Data $ht_Data -Control MPW_Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,$lb_MPW.Bounds.Bottom)
-            Size = New-Object System.Drawing.Size(($MPW_Form.ClientSize.Width - 20),20)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 10
+            Top = $lb_MPW.Bounds.Bottom
+            Width = $MPW_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::IBeam
             UseSystemPasswordChar = $true
@@ -960,7 +1177,8 @@ Create-Object -Name tb_MPW -Type TextBox -Data $ht_Data -Events $ar_Events -Cont
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(20,(($MPW_Form.ClientSize.Height - $ButtonSizeA.Height) - 14))
+            Left = 20
+            Top = $MPW_Form.ClientSize.Height - $ButtonSizeA.Height - 14
             Size = $ButtonSizeA
             Image = $Icons.Enter
             ImageAlign = [System.Drawing.ContentAlignment]::MiddleCenter
@@ -1003,7 +1221,7 @@ Create-Object -Name bt_MPW_Enter -Type Button -Data $ht_Data -Events $ar_Events 
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $MPW_Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
+$ht_Data.Left = $MPW_Form.ClientSize.Width / 2 - $ButtonSizeA.Width / 2
 $ht_Data.Image = $Icons.Plain
 
 $ar_Events = @(
@@ -1019,7 +1237,7 @@ Create-Object -Name bt_MPW_Plain -Type Button -Data $ht_Data -Events $ar_Events 
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $MPW_Form.ClientSize.Width - 20 - $ButtonSizeA.Width
+$ht_Data.Left = $MPW_Form.ClientSize.Width - 20 - $ButtonSizeA.Width
 $ht_Data.Image = $Icons.Close
 
 $ar_Events = @({Add_Click({$MPW_Form.Close()})})
@@ -1031,10 +1249,10 @@ Create-Object -Name bt_MPW_Close -Type Button -Data $ht_Data -Events $ar_Events 
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = New-Object System.Drawing.Size(450,120)
+            ClientSize = [System.Drawing.Size]::new(450,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Änderungsbestätigung"
+            Text = $Texts_List.Edit_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1054,15 +1272,21 @@ $ar_Events = @(
 
 Create-Object -Name Edit_Form -Type Form -Data $ht_Data -Events $ar_Events
 
+# -------------------------------------------------------------
+
+$SyncHash.Edit_Form = $Edit_Form
+
 # =============================================================
 # ========== Edit_Form: Labels =================================
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,20)
-            Size = New-Object System.Drawing.Size(($Edit_Form.ClientSize.Width - 20),20)
-            Text = "Datensatz wird überschrieben. Fortfahren?"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = 20
+            Width = $Edit_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Edit
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             }
 
@@ -1073,9 +1297,10 @@ Create-Object -Name lb_Edit -Type Label -Data $ht_Data -Control Edit_Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($Edit_Form.ClientSize.Width / 2) - ($ButtonSizeC.Width / 2) - 100), ($Edit_Form.ClientSize.Height - $ButtonSizeC.Height - 20))
+            Left = $Edit_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
+            Top = $Edit_Form.ClientSize.Height - $ButtonSizeC.Height - 20
             Size = $ButtonSizeC
-            Text = "Ja"
+            Text = $Texts_List.bt_Edit_OK
             DialogResult = [System.Windows.Forms.DialogResult]::OK
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
@@ -1089,8 +1314,8 @@ $Edit_Form.AcceptButton = $bt_Edit_OK
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Edit_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = "Nein"
+$ht_Data.Left = $Edit_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
+$ht_Data.Text = $Texts_List.bt_Edit_Cancel
 $ht_Data.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
 
 Create-Object -Name bt_Edit_Cancel -Type Button -Data $ht_Data -Control Edit_Form
@@ -1102,10 +1327,10 @@ $Edit_Form.CancelButton = $bt_Edit_Cancel
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = New-Object System.Drawing.Size(450,120)
+            ClientSize = [System.Drawing.Size]::new(450,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Löschbestätigung"
+            Text = $Texts_List.Del_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1125,15 +1350,21 @@ $ar_Events = @(
 
 Create-Object -Name Del_Form -Type Form -Data $ht_Data -Events $ar_Events
 
+# -------------------------------------------------------------
+
+$SyncHash.Del_Form = $Del_Form
+
 # =============================================================
 # ========== Del_Form: Labels =================================
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,20)
-            Size = New-Object System.Drawing.Size(($Del_Form.ClientSize.Width - 20),20)
-            Text = "Datensatz wird unwiderruflich gelöscht. Fortfahren?"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = 20
+            Width = $Del_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Del
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             }
 
@@ -1144,9 +1375,10 @@ Create-Object -Name lb_Del -Type Label -Data $ht_Data -Control Del_Form
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($Del_Form.ClientSize.Width / 2) - ($ButtonSizeC.Width / 2) - 100), ($Del_Form.ClientSize.Height - $ButtonSizeC.Height - 20))
+            Left = $Del_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
+            Top = $Del_Form.ClientSize.Height - $ButtonSizeC.Height - 20
             Size = $ButtonSizeC
-            Text = "Ja"
+            Text = $Texts_List.bt_Del_OK
             DialogResult = [System.Windows.Forms.DialogResult]::OK
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
@@ -1160,8 +1392,8 @@ $Del_Form.AcceptButton = $bt_Del_OK
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $Del_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = "Nein"
+$ht_Data.Left = $Del_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
+$ht_Data.Text = $Texts_List.bt_Del_Cancel
 $ht_Data.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
 
 Create-Object -Name bt_Del_Cancel -Type Button -Data $ht_Data -Control Del_Form
@@ -1173,10 +1405,10 @@ $Del_Form.CancelButton = $bt_Del_Cancel
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = New-Object System.Drawing.Size(560,150)
+            ClientSize = [System.Drawing.Size]::new(560,150)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Passwort-Generator"
+            Text = $Texts_List.PW_Generator_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1197,15 +1429,21 @@ $ar_Events = @(
 
 Create-Object -Name PW_Generator_Form -Type Form -Data $ht_Data -Events $ar_Events
 
+# -------------------------------------------------------------
+
+$SyncHash.PW_Generator_Form = $PW_Generator_Form
+
 # =============================================================
 # ========== PW_Generator_Form: Labels ========================
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(($PW_Generator_Form.ClientSize.Width / 2 - 60),10)
-            Size = New-Object System.Drawing.Size(120,22)
-            Text = "Konfiguration"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = $PW_Generator_Form.ClientSize.Width / 2 - 60
+            Top = 10
+            Width = 120
+            Height = 22
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Config
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
             Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -1227,9 +1465,11 @@ Create-Object -Name lb_Config -Type Label -Data $ht_Data -Events $ar_Events -Con
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,($PW_Generator_Form.ClientSize.Height / 2 - 15))
-            Size = New-Object System.Drawing.Size(($PW_Generator_Form.ClientSize.Width - 20),20)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 10
+            Top = $PW_Generator_Form.ClientSize.Height / 2 - 15
+            Width = $PW_Generator_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             TextAlign = [System.Windows.Forms.HorizontalAlignment]::Center
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -1245,7 +1485,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,"Klicken um Inhalt in die Zwischenablage zu kopieren.")
+                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
                     })}
               )
 
@@ -1256,8 +1496,10 @@ Create-Object -Name tb_r_Generator -Type TextBox -Data $ht_Data -Events $ar_Even
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(($PW_Generator_Form.ClientSize.Width / 2 - 180),20)
-            Size = New-Object System.Drawing.Size(360,120)
+            Left = $PW_Generator_Form.ClientSize.Width / 2 - 180
+            Top = 20
+            Width = 360
+            Height = 120
             BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
             BackColor = $PanelColor
             }
@@ -1285,9 +1527,10 @@ Create-Object -Name pn_Exclusions -Type Panel -Data $ht_Data -Events $ar_Events 
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($PW_Generator_Form.ClientSize.Width / 2) - ($ButtonSizeC.Width / 2) - 100),($PW_Generator_Form.ClientSize.Height - $ButtonSizeC.Height - 10))
+            Left = $PW_Generator_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
+            Top = $PW_Generator_Form.ClientSize.Height - $ButtonSizeC.Height - 10
             Size = $ButtonSizeC
-            Text = "Erstellen"
+            Text = $Texts_List.bt_PW_Create
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
@@ -1319,8 +1562,8 @@ Create-Object -Name bt_PW_Create -Type Button -Data $ht_Data -Events $ar_Events 
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $PW_Generator_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = "Schließen"
+$ht_Data.Left = $PW_Generator_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
+$ht_Data.Text = $Texts_List.bt_PW_Close
 
 $ar_Events = @({Add_Click({$PW_Generator_Form.Close()})})
 
@@ -1331,10 +1574,10 @@ Create-Object -Name bt_PW_Close -Type Button -Data $ht_Data -Events $ar_Events -
 # =============================================================
 
 $ht_Data = @{
-            ClientSize = New-Object System.Drawing.Size(400,350)
+            ClientSize = [System.Drawing.Size]::new(400,350)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = "Metadaten"
+            Text = $Texts_List.Metadata_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1354,15 +1597,21 @@ $ar_Events = @(
 
 Create-Object -Name Metadata_Form -Type Form -Data $ht_Data -Events $ar_Events
 
+# -------------------------------------------------------------
+
+$SyncHash.Metadata_Form = $Metadata_Form
+
 # =============================================================
 # ========== Metadata_Form: Labels ============================
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,10)
-            Size = New-Object System.Drawing.Size(($Metadata_Form.ClientSize.Width - 20),20)
-            Text = "Metadaten"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = 10
+            Top = 10
+            Width = $Metadata_Form.ClientSize.Width - 20
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Metadata
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -1373,9 +1622,11 @@ Create-Object -Name lb_Metadata -Type Label -Data $ht_Data -Control Metadata_For
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,$lb_Metadata.Bounds.Bottom)
-            Size = New-Object System.Drawing.Size(($Metadata_Form.ClientSize.Width - 20),120)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = 10
+            Top = $lb_Metadata.Bounds.Bottom
+            Width = $Metadata_Form.ClientSize.Width - 20
+            Height = 120
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::IBeam
             Multiline = $true
@@ -1389,11 +1640,12 @@ Create-Object -Name tb_Metadata -Type TextBox -Data $ht_Data -Control Metadata_F
 
 # -------------------------------------------------------------
 
-$ht_Data.Location = New-Object System.Drawing.Point(20,($tb_Metadata.Bounds.Bottom + 20))
-$ht_Data.Size = New-Object System.Drawing.Size(($Metadata_Form.ClientSize.Width - 40),120)
+$ht_Data.Left = 20
+$ht_Data.Top = $tb_Metadata.Bounds.Bottom + 20
+$ht_Data.Width = $Metadata_Form.ClientSize.Width - 40
 $ht_Data.Cursor = [System.Windows.Forms.Cursors]::Hand
 $ht_Data += @{
-             Text = "[Metadaten]"
+             Text = $Texts_List.tb_r_Metadata
              ReadOnly = $true
              }
 
@@ -1405,7 +1657,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,"Klicken um Inhalt in die Zwischenablage zu kopieren.")
+                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
                     })}
               )
 
@@ -1416,8 +1668,10 @@ Create-Object -Name tb_r_Metadata -Type TextBox -Data $ht_data -Events $ar_Event
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(10,($tb_Metadata.Bounds.Bottom + 10))
-            Size = New-Object System.Drawing.Size(($Metadata_Form.ClientSize.Width - 20),140)
+            Left = 10
+            Top = $tb_Metadata.Bounds.Bottom + 10
+            Width = $Metadata_Form.ClientSize.Width - 20
+            Height = 140
             BorderStyle = [System.Windows.Forms.BorderStyle]::Fixed3D
             }
 
@@ -1428,9 +1682,10 @@ Create-Object -Name pn_Metadata -Type Panel -Data $ht_Data -Control Metadata_For
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point((($Metadata_Form.ClientSize.Width / 2) - ($ButtonSizeC.Width / 2)),($Metadata_Form.ClientSize.Height - $ButtonSizeC.Height - 10))
+            Left = $Metadata_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2
+            Top = $Metadata_Form.ClientSize.Height - $ButtonSizeC.Height - 10
             Size = $ButtonSizeC
-            Text = "Schließen"
+            Text = $Texts_List.bt_Metadata_Close
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
@@ -1446,10 +1701,12 @@ Create-Object -Name bt_Metadata_Close -Type Button -Data $ht_Data -Events $ar_Ev
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(($pn_Exclusions.Width / 2 - 50),20)
-            Size = New-Object System.Drawing.Size(100,20)
-            Text = "Ausschlüsse"
-            Font = New-Object System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Left = $pn_Exclusions.Width / 2 - 50
+            Top = 20
+            Width = 100
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
+            Text = $Texts_List.lb_Exclusions
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BorderStyle = [System.Windows.Forms.BorderStyle]::None
             }
@@ -1458,8 +1715,8 @@ Create-Object -Name lb_Exclusions -Type Label -Data $ht_Data -Control pn_Exclusi
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.Y += 60
-$ht_Data.Text = "$Global:Chars Zeichen"
+$ht_Data.Top += 60
+$ht_Data.Text = $Texts_List.lb_Chars -f $Global:Chars
 
 Create-Object -Name lb_Chars -Type Label -Data $ht_Data -Control pn_Exclusions
 
@@ -1468,9 +1725,11 @@ Create-Object -Name lb_Chars -Type Label -Data $ht_Data -Control pn_Exclusions
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(($pn_Exclusions.Width / 2 - 170),$lb_Exclusions.Bounds.Bottom)
-            Size = New-Object System.Drawing.Size(340,20)
-            Font = New-Object System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
+            Left = $pn_Exclusions.Width / 2 - 170
+            Top = $lb_Exclusions.Bounds.Bottom
+            Width = 340
+            Height = 20
+            Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::IBeam
             TextAlign = [System.Windows.Forms.HorizontalAlignment]::Center
@@ -1485,7 +1744,8 @@ Create-Object -Name tb_Exclusions -Type TextBox -Data $ht_Data -Control pn_Exclu
 # =============================================================
 
 $ht_Data = @{
-            Location = New-Object System.Drawing.Point(100,$lb_Chars.Bounds.Top)
+            Left = 100
+            Top = $lb_Chars.Bounds.Top
             Size = $ButtonSizeD
             Text = "-"
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
@@ -1500,7 +1760,7 @@ $ar_Events = @(
                         If ($Global:Chars -gt 16)
                             {
                                 $Global:Chars -= 16
-                                $lb_Chars.Text = "$Global:Chars Zeichen"
+                                $lb_Chars.Text = $Texts_List.bt_Chars_Minus -f $Global:Chars
                             }
                     })}
               )
@@ -1509,7 +1769,7 @@ Create-Object -Name bt_Chars_Minus -Type Button -Data $ht_Data -Events $ar_Event
 
 # -------------------------------------------------------------
 
-$ht_Data.Location.X = $pn_Exclusions.Width - $ButtonSizeD.Width - 100
+$ht_Data.Left = $pn_Exclusions.Width - $ButtonSizeD.Width - 100
 $ht_Data.Text = "+"
 
 $ar_Events = @(
@@ -1518,7 +1778,7 @@ $ar_Events = @(
                         If ($Global:Chars -lt 64)
                             {
                                 $Global:Chars += 16
-                                $lb_Chars.Text = "$Global:Chars Zeichen"
+                                $lb_Chars.Text = $Texts_List.bt_Chars_Plus -f $Global:Chars
                             }
                     })}
               )
