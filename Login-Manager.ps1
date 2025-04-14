@@ -205,31 +205,7 @@ function Simulate-Timer ([HashTable]$SyncHash, [array]$RSNames)
                         Start-Sleep -Seconds 1
                     }
 
-                If ($SyncHash.MPW_Form.Visible)
-                    {
-                        $SyncHash.MPW_Form.Activate()
-                        $SyncHash.MPW_Form.Close()                    
-                    }
-                If ($SyncHash.Edit_Form.Visible)
-                    {
-                        $SyncHash.Edit_Form.Activate()
-                        $SyncHash.Edit_Form.Close()
-                    }
-                If ($SyncHash.Del_Form.Visible)
-                    {
-                        $SyncHash.Del_Form.Activate()
-                        $SyncHash.Del_Form.Close()
-                    }
-                If ($SyncHash.PW_Generator_Form.Visible)
-                    {
-                        $SyncHash.PW_Generator_Form.Activate()
-                        $SyncHash.PW_Generator_Form.Close()
-                    }
-                If ($SyncHash.Metadata_Form.Visible)
-                    {
-                        $SyncHash.Metadata_Form.Activate()
-                        $SyncHash.Metadata_Form.Close()
-                    }
+                $SyncHash.Keys | Where-Object {$SyncHash.$_.GetType().Name -in "Form"} | ForEach-Object {If ($SyncHash.$_.Visible) {$SyncHash.$_.Activate(); $SyncHash.$_.Close()}}
 
                 (Get-Process -Id $PID).CloseMainWindow()
             })
