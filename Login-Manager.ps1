@@ -55,7 +55,7 @@ $Msg_List = @{
     Addendum      = "Datensätze gefunden."
 }
 
-$Texts_List = @{
+$Txt_List = @{
     Form              = "Login-Manager"
     Edit_Form         = "Änderungsbestätigung"
     Del_Form          = "Löschbestätigung"
@@ -424,12 +424,12 @@ function Load-Result ([string]$Msg_A, [string]$Msg_B)
             {
                 $Global:ID = $null
                 $Global:Index = $null
-                $tb_r_URL.Text = $Texts_List.tb_r_URL
-                $tb_r_UserName.Text = $Texts_List.tb_r_UserName
-                $tb_r_Email.Text = $Texts_List.tb_r_Email
-                $tb_r_Password.Text = $Texts_List.tb_r_Password
+                $tb_r_URL.Text = $Txt_List.tb_r_URL
+                $tb_r_UserName.Text = $Txt_List.tb_r_UserName
+                $tb_r_Email.Text = $Txt_List.tb_r_Email
+                $tb_r_Password.Text = $Txt_List.tb_r_Password
                 $tb_r_Password.UseSystemPasswordChar = $false
-                $tb_r_Metadata.Text = $Texts_List.tb_r_Metadata
+                $tb_r_Metadata.Text = $Txt_List.tb_r_Metadata
                 $lb_Page.Text = "- / -"
                 $tb_r_URL.Enabled = $false
                 $tb_r_UserName.Enabled = $false
@@ -483,7 +483,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(400,(640 + ($IconMax.Height + 8) * 3))
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.Form
+            Text = $Txt_List.Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -530,7 +530,7 @@ $ht_Data = @{
             Top = 10
             Width = $Form.ClientSize.Width - 20
             Height = 20
-            Text = $Texts_List.lb_URL
+            Text = $Txt_List.lb_URL
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
@@ -540,21 +540,21 @@ Create-Object -Name lb_URL -Type Label -Data $ht_Data -Control Form
 # -------------------------------------------------------------
 
 $ht_Data.Top += 50
-$ht_Data.Text = $Texts_List.lb_UserName
+$ht_Data.Text = $Txt_List.lb_UserName
 
 Create-Object -Name lb_UserName -Type Label -Data $ht_Data -Control Form
 
 # -------------------------------------------------------------
 
 $ht_Data.Top += 50
-$ht_Data.Text = $Texts_List.lb_Email
+$ht_Data.Text = $Txt_List.lb_Email
 
 Create-Object -Name lb_Email -Type Label -Data $ht_Data -Control Form
 
 # -------------------------------------------------------------
 
 $ht_Data.Top += 50
-$ht_Data.Text = $Texts_List.lb_Password
+$ht_Data.Text = $Txt_List.lb_Password
 
 Create-Object -Name lb_Password -Type Label -Data $ht_Data -Control Form
 
@@ -799,7 +799,7 @@ $ht_Data = @{
             Font = New-Object -TypeName System.Drawing.Font($FontName, ($FontSize - 1), $FontStyle)
             BackColor = $TextBoxColor
             Cursor = [System.Windows.Forms.Cursors]::Hand
-            Text = $Texts_List.tb_r_URL
+            Text = $Txt_List.tb_r_URL
             TextAlign = [System.Windows.Forms.HorizontalAlignment]::Center
             Enabled = $false
             ReadOnly = $true
@@ -822,21 +822,21 @@ Create-Object -Name tb_r_URL -Type TextBox -Data $ht_Data -Events $ar_Events -Co
 # -------------------------------------------------------------
 
 $ht_Data.Top += 30
-$ht_Data.Text = $Texts_List.tb_r_UserName
+$ht_Data.Text = $Txt_List.tb_r_UserName
 
 Create-Object -Name tb_r_UserName -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
 $ht_Data.Top += 30
-$ht_Data.Text = $Texts_List.tb_r_Email
+$ht_Data.Text = $Txt_List.tb_r_Email
 
 Create-Object -Name tb_r_Email -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # -------------------------------------------------------------
 
 $ht_Data.Top += 30
-$ht_Data.Text = $Texts_List.tb_r_Password
+$ht_Data.Text = $Txt_List.tb_r_Password
 
 Create-Object -Name tb_r_Password -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
@@ -943,7 +943,7 @@ $ht_Data = @{
             Top = $bt_Next.Bounds.Bottom + 10
             Size = $ButtonSizeB
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.bt_MPW
+            Text = $Txt_List.bt_MPW
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
             Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -1002,7 +1002,7 @@ $ht_Data = @{
             Width = $Form.ClientSize.Width - 20
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Events
+            Text = $Txt_List.lb_Events
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -1070,7 +1070,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(400,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.MPW_Form
+            Text = $Txt_List.MPW_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             KeyPreview = $true
@@ -1110,7 +1110,7 @@ $ht_Data = @{
             Width = $MPW_Form.ClientSize.Width - 20
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_MPW
+            Text = $Txt_List.lb_MPW
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -1228,7 +1228,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(450,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.Edit_Form
+            Text = $Txt_List.Edit_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1262,7 +1262,7 @@ $ht_Data = @{
             Width = $Edit_Form.ClientSize.Width - 20
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Edit
+            Text = $Txt_List.lb_Edit
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             }
 
@@ -1276,7 +1276,7 @@ $ht_Data = @{
             Left = $Edit_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
             Top = $Edit_Form.ClientSize.Height - $ButtonSizeC.Height - 20
             Size = $ButtonSizeC
-            Text = $Texts_List.bt_Edit_OK
+            Text = $Txt_List.bt_Edit_OK
             DialogResult = [System.Windows.Forms.DialogResult]::OK
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
@@ -1291,7 +1291,7 @@ $Edit_Form.AcceptButton = $bt_Edit_OK
 # -------------------------------------------------------------
 
 $ht_Data.Left = $Edit_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = $Texts_List.bt_Edit_Cancel
+$ht_Data.Text = $Txt_List.bt_Edit_Cancel
 $ht_Data.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
 
 Create-Object -Name bt_Edit_Cancel -Type Button -Data $ht_Data -Control Edit_Form
@@ -1306,7 +1306,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(450,120)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.Del_Form
+            Text = $Txt_List.Del_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1340,7 +1340,7 @@ $ht_Data = @{
             Width = $Del_Form.ClientSize.Width - 20
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Del
+            Text = $Txt_List.lb_Del
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             }
 
@@ -1354,7 +1354,7 @@ $ht_Data = @{
             Left = $Del_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
             Top = $Del_Form.ClientSize.Height - $ButtonSizeC.Height - 20
             Size = $ButtonSizeC
-            Text = $Texts_List.bt_Del_OK
+            Text = $Txt_List.bt_Del_OK
             DialogResult = [System.Windows.Forms.DialogResult]::OK
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
@@ -1369,7 +1369,7 @@ $Del_Form.AcceptButton = $bt_Del_OK
 # -------------------------------------------------------------
 
 $ht_Data.Left = $Del_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = $Texts_List.bt_Del_Cancel
+$ht_Data.Text = $Txt_List.bt_Del_Cancel
 $ht_Data.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
 
 Create-Object -Name bt_Del_Cancel -Type Button -Data $ht_Data -Control Del_Form
@@ -1384,7 +1384,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(560,150)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.PW_Generator_Form
+            Text = $Txt_List.PW_Generator_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1419,7 +1419,7 @@ $ht_Data = @{
             Width = 120
             Height = 22
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Config
+            Text = $Txt_List.lb_Config
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
             Cursor = [System.Windows.Forms.Cursors]::Hand
@@ -1506,7 +1506,7 @@ $ht_Data = @{
             Left = $PW_Generator_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 - 100
             Top = $PW_Generator_Form.ClientSize.Height - $ButtonSizeC.Height - 10
             Size = $ButtonSizeC
-            Text = $Texts_List.bt_PW_Create
+            Text = $Txt_List.bt_PW_Create
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
@@ -1539,7 +1539,7 @@ Create-Object -Name bt_PW_Create -Type Button -Data $ht_Data -Events $ar_Events 
 # -------------------------------------------------------------
 
 $ht_Data.Left = $PW_Generator_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2 + 100
-$ht_Data.Text = $Texts_List.bt_PW_Close
+$ht_Data.Text = $Txt_List.bt_PW_Close
 
 $ar_Events = @({Add_Click({$PW_Generator_Form.Close()})})
 
@@ -1553,7 +1553,7 @@ $ht_Data = @{
             ClientSize = [System.Drawing.Size]::new(400,350)
             StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
             Icon = $Paths.IconFolder + "Login-Manager.ico"
-            Text = $Texts_List.Metadata_Form
+            Text = $Txt_List.Metadata_Form
             BackColor = $FormColor
             FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
             MaximizeBox = $false
@@ -1587,7 +1587,7 @@ $ht_Data = @{
             Width = $Metadata_Form.ClientSize.Width - 20
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Metadata
+            Text = $Txt_List.lb_Metadata
             TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
             }
 
@@ -1621,7 +1621,7 @@ $ht_Data.Top = $tb_Metadata.Bounds.Bottom + 20
 $ht_Data.Width = $Metadata_Form.ClientSize.Width - 40
 $ht_Data.Cursor = [System.Windows.Forms.Cursors]::Hand
 $ht_Data += @{
-             Text = $Texts_List.tb_r_Metadata
+             Text = $Txt_List.tb_r_Metadata
              ReadOnly = $true
              }
 
@@ -1661,7 +1661,7 @@ $ht_Data = @{
             Left = $Metadata_Form.ClientSize.Width / 2 - $ButtonSizeC.Width / 2
             Top = $Metadata_Form.ClientSize.Height - $ButtonSizeC.Height - 10
             Size = $ButtonSizeC
-            Text = $Texts_List.bt_Metadata_Close
+            Text = $Txt_List.bt_Metadata_Close
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BackColor = $ButtonColorC
             FlatStyle = [System.Windows.Forms.FlatStyle]::Popup
@@ -1682,7 +1682,7 @@ $ht_Data = @{
             Width = 100
             Height = 20
             Font = New-Object -TypeName System.Drawing.Font($FontName, $FontSize, $FontStyle)
-            Text = $Texts_List.lb_Exclusions
+            Text = $Txt_List.lb_Exclusions
             TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
             BorderStyle = [System.Windows.Forms.BorderStyle]::None
             }
@@ -1692,7 +1692,7 @@ Create-Object -Name lb_Exclusions -Type Label -Data $ht_Data -Control pn_Exclusi
 # -------------------------------------------------------------
 
 $ht_Data.Top += 60
-$ht_Data.Text = $Texts_List.lb_Chars -f $Global:Chars
+$ht_Data.Text = $Txt_List.lb_Chars -f $Global:Chars
 
 Create-Object -Name lb_Chars -Type Label -Data $ht_Data -Control pn_Exclusions
 
@@ -1736,7 +1736,7 @@ $ar_Events = @(
                         If ($Global:Chars -gt 16)
                             {
                                 $Global:Chars -= 16
-                                $lb_Chars.Text = $Texts_List.bt_Chars_Minus -f $Global:Chars
+                                $lb_Chars.Text = $Txt_List.bt_Chars_Minus -f $Global:Chars
                             }
                     })}
               )
@@ -1754,7 +1754,7 @@ $ar_Events = @(
                         If ($Global:Chars -lt 64)
                             {
                                 $Global:Chars += 16
-                                $lb_Chars.Text = $Texts_List.bt_Chars_Plus -f $Global:Chars
+                                $lb_Chars.Text = $Txt_List.bt_Chars_Plus -f $Global:Chars
                             }
                     })}
               )
