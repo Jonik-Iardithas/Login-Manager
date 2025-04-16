@@ -218,8 +218,8 @@ function Simulate-Timer ([HashTable]$SyncHash, [array]$RSNames)
 
 function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key)
     {
-        $SHA = New-Object System.Security.Cryptography.SHA256Managed
-        $AES = New-Object System.Security.Cryptography.AesManaged
+        $SHA = New-Object -TypeName System.Security.Cryptography.SHA256Managed
+        $AES = New-Object -TypeName System.Security.Cryptography.AesManaged
         $AES.Mode = [System.Security.Cryptography.CipherMode]::CBC
         $AES.Padding = [System.Security.Cryptography.PaddingMode]::Zeros
         $AES.BlockSize = 128
@@ -297,9 +297,10 @@ function Verify-MPW ([string]$PW)
         Else
             {
                 $Randomizer = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-                $Buffer = New-Object byte[] (Get-Random -Maximum 1024 -Minimum 512)
+                $Buffer = [byte[]]::new((Get-Random -Maximum 1024 -Minimum 512))
                 $Randomizer.GetBytes($Buffer)
-                $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty)
+                $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty).Trim("0")
+                If ($UserData.Length % 2) {$UserData += [System.BitConverter]::ToString((Get-Random -Maximum 16 -Minimum 1))[-1]}
                 $PWByteArray = [System.Text.Encoding]::UTF8.GetBytes($PW)
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
                 $PWHexString = [System.BitConverter]::ToString($PWByteArray).Replace("-",[string]::Empty)
@@ -315,7 +316,7 @@ function Verify-MPW ([string]$PW)
 
 function Create-Object ([string]$Name, [string]$Type, [HashTable]$Data, [array]$Events, [string]$Control)
     {
-        New-Variable -Name $Name -Value (New-Object System.Windows.Forms.$Type) -Scope Global -Force
+        New-Variable -Name $Name -Value (New-Object -TypeName System.Windows.Forms.$Type) -Scope Global -Force
 
         ForEach ($k in $Data.Keys) {Invoke-Expression ("`$$Name.$k = " + {$Data.$k})}
         ForEach ($e in $Events)    {Invoke-Expression ("`$$Name.$e")}
@@ -1483,7 +1484,7 @@ $ht_Data = @{
 $ar_Events = @(
                 {Add_MouseLeave(
                     {
-                        $Point = New-Object System.Drawing.Point(([System.Windows.Forms.Cursor]::Position.X + 3),([System.Windows.Forms.Cursor]::Position.Y + 3))
+                        $Point = New-Object -TypeName System.Drawing.Point(([System.Windows.Forms.Cursor]::Position.X + 3),([System.Windows.Forms.Cursor]::Position.Y + 3))
                         If ($pn_Exclusions.PointToClient($Point).X -lt 3 -or
                             $pn_Exclusions.PointToClient($Point).Y -lt 3 -or
                             $pn_Exclusions.PointToClient($Point).X -gt $pn_Exclusions.Width -or
