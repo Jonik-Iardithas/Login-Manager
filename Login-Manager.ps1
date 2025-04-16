@@ -300,7 +300,7 @@ function Verify-MPW ([string]$PW)
                 $Buffer = [byte[]]::new((Get-Random -Maximum 1024 -Minimum 512))
                 $Randomizer.GetBytes($Buffer)
                 $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty).Trim("0")
-                If ($UserData.Length % 2) {$UserData += [System.BitConverter]::ToString((Get-Random -Maximum 16 -Minimum 1))[-1]}
+                If ($UserData.Length % 2) {$UserData += [System.BitConverter]::ToString((Get-Random -InputObject @(1..15)))[-1]}
                 $PWByteArray = [System.Text.Encoding]::UTF8.GetBytes($PW)
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
                 $PWHexString = [System.BitConverter]::ToString($PWByteArray).Replace("-",[string]::Empty)
