@@ -271,7 +271,7 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                     }
                 ElseIf ($Format -in 'Hex')
                     {
-                        return [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted).ToString().Trim("0")
+                        return [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted).ToString().TrimEnd("0")
                     }
             }
 
@@ -299,7 +299,7 @@ function Verify-MPW ([string]$PW)
                 $Randomizer = [System.Security.Cryptography.RandomNumberGenerator]::Create()
                 $Buffer = [byte[]]::new((Get-Random -InputObject @(512..1024)))
                 $Randomizer.GetBytes($Buffer)
-                $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty).Trim("0")
+                $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty).TrimEnd("0")
                 If ($UserData.Length % 2) {$UserData += [System.BitConverter]::ToString((Get-Random -InputObject @(1..15)))[-1]}
                 $PWByteArray = [System.Text.Encoding]::UTF8.GetBytes($PW)
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
