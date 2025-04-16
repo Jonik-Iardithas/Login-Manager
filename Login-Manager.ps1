@@ -297,7 +297,7 @@ function Verify-MPW ([string]$PW)
         Else
             {
                 $Randomizer = [System.Security.Cryptography.RandomNumberGenerator]::Create()
-                $Buffer = [byte[]]::new((Get-Random -Maximum 1024 -Minimum 512))
+                $Buffer = [byte[]]::new((Get-Random -InputObject @(512..1024)))
                 $Randomizer.GetBytes($Buffer)
                 $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty).Trim("0")
                 If ($UserData.Length % 2) {$UserData += [System.BitConverter]::ToString((Get-Random -InputObject @(1..15)))[-1]}
