@@ -144,7 +144,10 @@ function Initialize-Me ([string]$FilePath)
 
         $Data = [array](Get-Content -Path $FilePath)
 
-        ForEach ($i in $Data) {$ht_Result += @{$i.Split("=")[0].Trim(" ") = $i.Split("=")[-1].Trim(" ")}}
+        ForEach ($i in $Data)
+            {
+                $ht_Result += @{$i.Split("=")[0].Trim() = $i.Split("=")[-1].Trim()}
+            }
 
         return $ht_Result
     }
