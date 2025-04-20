@@ -32,7 +32,7 @@ $Global:Count = [System.TimeSpan]::FromSeconds(900)
 $L_Ptr = [System.IntPtr]::new(0)
 $S_Ptr = [System.IntPtr]::new(0)
 $SyncHash = [HashTable]::Synchronized(@{Counter = $Global:Count})
-$RSNames = @("Timer","CleanUp")
+$RSList = @("Timer")
 
 $Msg_List = @{
     Start         = "Login-Manager gestartet."
@@ -154,51 +154,14 @@ function Initialize-Me ([string]$FilePath)
 
 # -------------------------------------------------------------
 
-function Clean-Up ([array]$RSNames)
+function Simulate-Timer ([HashTable]$SyncHash)
     {
-        If (Get-Runspace -Name $RSNames[-1]) {return}
-
         $Runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
         $Runspace.ApartmentState = "STA"
         $Runspace.ThreadOptions = "ReuseThread"
-        $Runspace.Name = $RSNames[-1]
-        $Runspace.Open()
-        $Runspace.SessionStateProxy.SetVariable("RSNames", $RSNames)
-        
-        $PSInstance = [System.Management.Automation.PowerShell]::Create().AddScript(
-            {
-                While ($true)
-                    {
-                        $RS = Get-Runspace -Name $RSNames
-                        ForEach($i in $RS)
-                            {
-                                If ($i.RunspaceAvailability -eq 'Available')
-                                    {
-                                        $i.Dispose()
-                                        [System.GC]::Collect()
-                                    }
-                            }
-                        Start-Sleep -Milliseconds 100
-                    }
-            })
-
-        $PSInstance.Runspace = $Runspace
-        $PSInstance.BeginInvoke()
-    }
-
-# -------------------------------------------------------------
-
-function Simulate-Timer ([HashTable]$SyncHash, [array]$RSNames)
-    {
-        If (Get-Runspace -Name $RSNames[0]) {return}
-
-        $Runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace()
-        $Runspace.ApartmentState = "STA"
-        $Runspace.ThreadOptions = "ReuseThread"
-        $Runspace.Name = $RSNames[0]
+        $Runspace.Name = "Timer"
         $Runspace.Open()
         $Runspace.SessionStateProxy.SetVariable("SyncHash", $SyncHash)
-        $Runspace.SessionStateProxy.SetVariable("RSNames", $RSNames)
         
         $PSInstance = [System.Management.Automation.PowerShell]::Create().AddScript(
             {
@@ -468,8 +431,9 @@ $Paths = Initialize-Me -FilePath $SettingsFile
 
 # -------------------------------------------------------------
 
-Create-Object -Name Tooltip -Type Tooltip
-$Tooltip.IsBalloon = $true
+$ht_Data = @{IsBalloon = $true}
+
+Create-Object -Name Tooltip -Type Tooltip -Data $ht_Data
 
 # -------------------------------------------------------------
 
@@ -503,17 +467,13 @@ $ar_Events = @(
                                 New-Item -Path $Paths.LoginFile -Force
                                 Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.NoLogins
                             }
-                        Clean-Up -RSNames $RSNames
-                        Simulate-Timer -SyncHash $SyncHash -RSNames $RSNames
+                        Simulate-Timer -SyncHash $SyncHash
                     })}
                 {Add_FormClosing(
                     {
                         Set-Clipboard -Value $null
-                        $this.Cursor = [System.Windows.Forms.Cursors]::WaitCursor
-                        $this.Text += " (Closing...)"
-                        Start-Sleep -Seconds 1
 
-                        $RS = Get-Runspace -Name $RSNames
+                        $RS = Get-Runspace -Name $RSList
                         ForEach($i in $RS)
                             {
                                 $i.Dispose()
