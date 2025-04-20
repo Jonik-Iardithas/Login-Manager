@@ -1483,7 +1483,7 @@ $ar_Events = @(
                         $Str = [string]::Empty
 
                         Do {
-                                $RND = Get-Random -Minimum 33 -Maximum 126
+                                $RND = Get-Random -InputObject @(33..126)
                                 If ($ar_Exclude -notcontains $RND)
                                     {
                                         $Str += [System.Text.Encoding]::ASCII.GetChars($RND)
