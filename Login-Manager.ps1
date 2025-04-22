@@ -206,6 +206,8 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                 $Encryptor = $AES.CreateEncryptor()
                 $Encrypted = $Encryptor.TransformFinalBlock($Plain, 0, $Plain.Length)
                 $Encrypted = $AES.IV + $Encrypted
+                $SHA.Dispose()
+                $AES.Dispose()
 
                 If ($Format -in 'Text')
                     {
@@ -230,6 +232,8 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                 $AES.IV = $Cipher[0..15]
                 $Decryptor = $AES.CreateDecryptor()
                 $Decrypted = $Decryptor.TransformFinalBlock($Cipher, 16, $Cipher.Length - 16)
+                $SHA.Dispose()
+                $AES.Dispose()
 
                 If ($Format -in 'Text')
                     {
@@ -240,9 +244,6 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                         return [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted.Where({$_ -ne [char]0})).ToString()
                     }
             }
-
-        $SHA.Dispose()
-        $AES.Dispose()
     }
 
 # -------------------------------------------------------------
@@ -273,6 +274,7 @@ function Verify-MPW ([string]$PW)
                 $UserData = $UserData.Insert($Pos,$PWHexString)
                 $Data = Crypt-Text -Mode Encrypt -Format Hex -Text $UserData -Key $PW
                 Set-Content -Value $Data -Path $Paths.UserDataFile -NoNewline
+                $Randomizer.Dispose()
                 return $true
             }
     }
