@@ -206,16 +206,14 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                 $Encryptor = $AES.CreateEncryptor()
                 $Encrypted = $Encryptor.TransformFinalBlock($Plain, 0, $Plain.Length)
                 $Encrypted = $AES.IV + $Encrypted
-                $SHA.Dispose()
-                $AES.Dispose()
 
                 If ($Format -in 'Text')
                     {
-                        return [System.Convert]::ToBase64String($Encrypted)
+                        $Output = [System.Convert]::ToBase64String($Encrypted)
                     }
                 ElseIf ($Format -in 'Hex')
                     {
-                        return [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Encrypted).ToString()
+                        $Output = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Encrypted).ToString()
                     }
             }
         ElseIf ($Mode -in 'Decrypt')
@@ -232,18 +230,21 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
                 $AES.IV = $Cipher[0..15]
                 $Decryptor = $AES.CreateDecryptor()
                 $Decrypted = $Decryptor.TransformFinalBlock($Cipher, 16, $Cipher.Length - 16)
-                $SHA.Dispose()
-                $AES.Dispose()
 
                 If ($Format -in 'Text')
                     {
-                        return [System.Text.Encoding]::UTF8.GetString($Decrypted).Trim([char]0)
+                        $Output = [System.Text.Encoding]::UTF8.GetString($Decrypted).Trim([char]0)
                     }
                 ElseIf ($Format -in 'Hex')
                     {
-                        return [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted.Where({$_ -ne [char]0})).ToString()
+                        $Output = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted.Where({$_ -ne [char]0})).ToString()
                     }
             }
+
+        $SHA.Dispose()
+        $AES.Dispose()
+
+        return $Output
     }
 
 # -------------------------------------------------------------
