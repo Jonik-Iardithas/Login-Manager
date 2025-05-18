@@ -10,7 +10,7 @@ Der [Backup-Maker](https://github.com/Jonik-Iardithas/Backup-Maker/) erzeugt, wi
 
 Beide Anwendungen erfordern eine gewisse Dateistruktur um zu laufen, weshalb ich Installationsprogramme dafür geschrieben habe. Es werden keine Änderungen an der Registry durchgeführt, lediglich Dateien und Ordner erstellt bzw. kopiert und, je nach Wunsch, Verknüpfungen erstellt. Am Ende findet sich eine Liste mit den vorgenommenen Änderungen.
 
-Um dem Ganzen einen etwas moderneren Look zu verpassen, habe ich optionale Icons beigefügt, die nach Wunsch manuell in das entsprechende Icon-Verzeichnis kopiert werden können. Dieses findet sich standardmäßig unter
+Um dem Ganzen einen etwas ästhetischeren Look zu verpassen, habe ich optionale Icons beigefügt, die nach Wunsch manuell in das entsprechende Icon-Verzeichnis kopiert werden können. Dieses findet sich standardmäßig unter
 
 `C:\Program Files\PowerShellTools\Login-Manager\Icons`\
 `C:\Program Files\PowerShellTools\Backup-Maker\Icons`
