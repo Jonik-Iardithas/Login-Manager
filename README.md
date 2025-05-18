@@ -29,26 +29,49 @@ Folgende Dateien werden beim Installationsvorgang erstellt bzw. kopiert:
 
 Ini-Dateien:
 
-`C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini`\
-`C:\Users\%username%\AppData\Local\PowerShellTools\Backup-Maker\Settings.ini`
+`C:\Users\%username%\AppData\Local\PowerShellTools\Backup-Maker\Settings.ini`\
+`C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini`
 
 Verknüpfungen (optional):
 
 `C:\Users\%username%\Desktop\Backup-Maker.lnk`\
 `C:\Users\%username%\Desktop\Login-Manager.lnk`
 
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk`\
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk`
-
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Backup-Maker.lnk`\
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Uninstall (Backup-Maker).lnk`
 
+`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk`\
+`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk`
+
 Ordner mit Icons und Skript-Dateien:
 
-`C:\Program Files\PowerShellTools\Login-Manager`\
-`C:\Program Files\PowerShellTools\Login-Manager\Icons`\
 `C:\Program Files\PowerShellTools\Backup-Maker`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons`
+`C:\Program Files\PowerShellTools\Backup-Maker\Backup-Maker.ps1`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Uninstall.ps1`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Backup-Maker.ico`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Copy.ico`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_NewFolder.ico`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Remove.ico`\
+`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Replace.ico`
+
+`C:\Program Files\PowerShellTools\Login-Manager`\
+`C:\Program Files\PowerShellTools\Login-Manager\Login-Manager.ps1`\
+`C:\Program Files\PowerShellTools\Login-Manager\Uninstall.ps1`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Login-Manager.ico`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Add.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Close.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Del.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Edit.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Enter.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Exit.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Find.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Metadata.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Next.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Plain.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Prev.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator.png`
 
 ---
 
