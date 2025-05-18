@@ -23,32 +23,39 @@ $ButtonSize = [System.Drawing.Size]::new(120,28)
 $ButtonBackColor = [System.Drawing.Color]::Bisque
 $ButtonForeColor = [System.Drawing.Color]::MidnightBlue
 $ButtonHoverColor = [System.Drawing.Color]::LightYellow
-$UninstallText = "Dieser Uninstaller entfernt das Programm Login-Manager und seine Komponenten."
-$SuccessText = "Deinstallation erfolgreich abgeschlossen!"
 $Global:Settings = "$env:LOCALAPPDATA\PowerShellTools\Login-Manager"
-$Global:Path = (Split-Path -Path $PSCommandPath -Parent) + "\Login-Manager.ps1"
+$Global:Path = "$PSScriptRoot\Login-Manager.ps1"
 $Global:Desktop = "$env:USERPROFILE\Desktop\Login-Manager.lnk"
 $Global:StartMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager"
+
+$Txt_List = @{
+    Form      = "Uninstaller für Login-Manager"
+    Label0    = "Dieser Uninstaller entfernt das Programm Login-Manager und seine Komponenten."
+    Label1    = "Deinstallation erfolgreich abgeschlossen!"
+    bt_Accept = "Fortfahren"
+    bt_Cancel = "Abbruch"
+    bt_Exit   = "Beenden"
+}
+
+$MB_list = @{
+    Ini_01 = "Konnte Datei {0} nicht finden."
+    Ini_02 = "Fehler!"
+}
 
 # ========== Self-Test ========================================
 
 If (!(Test-Path -Path $Global:Path))
     {
-        [System.Windows.Forms.MessageBox]::Show("Konnte Datei `"$Global:Path`" nicht finden.","Fehler!",0)
+        [System.Windows.Forms.MessageBox]::Show(($MB_list.Ini_01 -f $Global:Path),$MB_list.Ini_02,0)
         Exit
     }
-
-# ========== Tooltips =========================================
-
-$Tooltip = New-Object -TypeName System.Windows.Forms.ToolTip
-$Tooltip.IsBalloon = $true
 
 # ========== Form =============================================
 
 $Form = New-Object -TypeName System.Windows.Forms.Form
 $Form.ClientSize = $FormSize
 $Form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
-$Form.Text = "Uninstaller für Login-Manager"
+$Form.Text = $Txt_List.Form
 $Form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSHOME\powershell.exe")
 $Form.BackColor = $FormBackColor
 $Form.ForeColor = $FormForeColor
@@ -64,7 +71,7 @@ $Label.Left = 20
 $Label.Top = 20
 $Label.Width = $Form.ClientSize.Width - 40
 $Label.Height = 50
-$Label.Text = $UninstallText
+$Label.Text = $Txt_List.Label0
 $Label.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, ($FontSize + 1), $FontStyle)
 $Label.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
 
@@ -79,7 +86,7 @@ $bt_Accept.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
 $bt_Accept.BackColor = $ButtonBackColor
 $bt_Accept.ForeColor = $ButtonForeColor
 $bt_Accept.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Accept.Text = "Fortfahren"
+$bt_Accept.Text = $Txt_List.bt_Accept
 $bt_Accept.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
 $bt_Accept.Cursor = [System.Windows.Forms.Cursors]::Hand
 $bt_Accept.Add_Click(
@@ -120,7 +127,7 @@ $bt_Accept.Add_Click(
                     }
             }
 
-        $Label.Text = $SuccessText
+        $Label.Text = $Txt_List.Label1
         $bt_Accept.Visible = $false
         $bt_Cancel.Visible = $false
         $bt_Exit.Visible = $true
@@ -138,7 +145,7 @@ $bt_Cancel.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
 $bt_Cancel.BackColor = $ButtonBackColor
 $bt_Cancel.ForeColor = $ButtonForeColor
 $bt_Cancel.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Cancel.Text = "Abbruch"
+$bt_Cancel.Text = $Txt_List.bt_Cancel
 $bt_Cancel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
 $bt_Cancel.Cursor = [System.Windows.Forms.Cursors]::Hand
 $bt_Cancel.Add_Click(
@@ -158,7 +165,7 @@ $bt_Exit.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
 $bt_Exit.BackColor = $ButtonBackColor
 $bt_Exit.ForeColor = $ButtonForeColor
 $bt_Exit.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Exit.Text = "Beenden"
+$bt_Exit.Text = $Txt_List.bt_Exit
 $bt_Exit.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
 $bt_Exit.Cursor = [System.Windows.Forms.Cursors]::Hand
 $bt_Exit.Visible = $false
