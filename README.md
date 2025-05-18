@@ -10,14 +10,14 @@ Der [Backup-Maker](https://github.com/Jonik-Iardithas/Backup-Maker/) erzeugt, wi
 
 Beide Anwendungen erfordern eine gewisse Dateistruktur um zu laufen, weshalb ich Installationsprogramme dafür geschrieben habe. Es werden keine Änderungen an der Registry durchgeführt, lediglich Dateien und Ordner erstellt bzw. kopiert und, je nach Wunsch, Verknüpfungen erstellt. Am Ende findet sich eine Liste mit den vorgenommenen Änderungen.
 
-Um dem Ganzen einen etwas ästhetischeren Look zu verpassen, habe ich optionale Icons beigefügt, die nach Wunsch manuell in das entsprechende Icon-Verzeichnis kopiert werden können. Dieses findet sich standardmäßig unter
+Um dem Ganzen einen etwas ästhetischeren Look zu verpassen, habe ich optionale Icons beigefügt, die während des Installationsprozesses nach Wunsch mitkopiert werden können. Das Icon-Verzeichnis findet sich standardmäßig unter
 
 `C:\Program Files\PowerShellTools\Login-Manager\Icons`\
 `C:\Program Files\PowerShellTools\Backup-Maker\Icons`
 
 **Installationsanleitung:**
 
-Das komplette Archiv unter `Zip/ALL/` herunterladen und entpacken, so dass die Datei `Install.ps1` sowie das dazugehörige Zip-Archiv vorhanden sind. Anschließend die Datei `Install.ps1` mittels rechter Maustaste und *"Mit PowerShell ausführen"* starten. Nach der Installation das Icons-Archiv entpacken und die Icons nach Wunsch kopieren (ist nun als Option im Installationsskript anwählbar!).
+Das komplette Archiv unter `Zip/ALL/` herunterladen und entpacken, so dass die Datei `Install.ps1` sowie das dazugehörige Zip-Archiv vorhanden sind. Anschließend die Datei `Install.ps1` mittels rechter Maustaste und *"Mit PowerShell ausführen"* starten.
 
 Noch eine technische Bemerkung: In meinen Skripten mache ich exzessiven Gebrauch von der `+=` Methode! Mir ist die fortlaufende Diskussion um dieses Thema bewusst. Nur soviel dazu: Ich benutze Windows Powershell 5.1 und konnte beim Programmieren keinerlei Performance-Einbrüche aufgrund dieser Methode feststellen. Es verhielt sich vielmehr so, dass andere, teils hochgelobte Alternativen zu messbaren Einbrüchen der Performance geführt haben. Wer sich also von der `+=` Methode auf den Schlips getreten fühlt, sollte meine Skripte meiden (oder Fliege tragen).
 
