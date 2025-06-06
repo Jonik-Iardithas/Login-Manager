@@ -11,7 +11,7 @@ If (!([System.Security.Principal.WindowsPrincipal][System.Security.Principal.Win
 [System.Windows.Forms.Application]::EnableVisualStyles()
 [System.Drawing.FontFamily]::Families | ForEach-Object {$Fonts += @($_)}
 
-# ========== Constants ========================================
+# ========== Variables ========================================
 
 $FormSize = [System.Drawing.Size]::new(420,240)
 $FormBackColor = [System.Drawing.Color]::Honeydew
@@ -37,10 +37,32 @@ $Txt_List = @{
     bt_Exit   = "Beenden"
 }
 
-$MB_list = @{
+$MB_List = @{
     Ini_01 = "Konnte Datei {0} nicht finden."
     Ini_02 = "Fehler!"
 }
+
+# ========== Functions ========================================
+
+function Create-Object ([string]$Name, [string]$Type, [HashTable]$Data, [array]$Events, [string]$Control)
+    {
+        New-Variable -Name $Name -Value (New-Object -TypeName System.Windows.Forms.$Type) -Scope Global -Force
+
+        ForEach ($k in $Data.Keys)
+            {
+                Invoke-Expression -Command ("`$$Name.$k = " + {$Data.$k})
+            }
+
+        ForEach ($i in $Events)
+            {
+                Invoke-Expression -Command ("`$$Name.$i")
+            }
+
+        If ($Control)
+            {
+                Invoke-Expression -Command ("`$$Control.Controls.Add(`$$Name)")
+            }
+    }
 
 # ========== Self-Test ========================================
 
@@ -52,132 +74,118 @@ If (!(Test-Path -Path $Global:Path))
 
 # ========== Form =============================================
 
-$Form = New-Object -TypeName System.Windows.Forms.Form
-$Form.ClientSize = $FormSize
-$Form.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
-$Form.Text = $Txt_List.Form
-$Form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSHOME\powershell.exe")
-$Form.BackColor = $FormBackColor
-$Form.ForeColor = $FormForeColor
-$Form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
-$Form.MaximizeBox = $false
-$Form.MinimizeBox = $false
-$Form.Add_Load({$this.ActiveControl = $bt_Cancel})
+$ht_Data = @{
+            ClientSize = $FormSize
+            StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
+            Text = $Txt_List.Form
+            Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSHOME\powershell.exe")
+            BackColor = $FormBackColor
+            ForeColor = $FormForeColor
+            FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
+            MaximizeBox = $false
+            MinimizeBox = $false
+            }
+
+$ar_Events = @({Add_Load({$this.ActiveControl = $bt_Cancel})})
+
+Create-Object -Name Form -Type Form -Data $ht_Data -Events $ar_Events
 
 # ========== Form: Label ======================================
 
-$Label = New-Object -TypeName System.Windows.Forms.Label
-$Label.Left = 20
-$Label.Top = 20
-$Label.Width = $Form.ClientSize.Width - 40
-$Label.Height = 50
-$Label.Text = $Txt_List.Label0
-$Label.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, ($FontSize + 1), $FontStyle)
-$Label.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+$ht_Data = @{
+            Left = 20
+            Top = 20
+            Width = $Form.ClientSize.Width - 40
+            Height = 50
+            Text = $Txt_List.Label0
+            Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, ($FontSize + 1), $FontStyle)
+            TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+            }
 
-# ========== Accept-Button ====================================
+Create-Object -Name Label -Type Label -Data $ht_Data -Control Form
 
-$bt_Accept = New-Object -TypeName System.Windows.Forms.Button
-$bt_Accept.Left = 20
-$bt_Accept.Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
-$bt_Accept.Size = $ButtonSize
-$bt_Accept.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-$bt_Accept.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
-$bt_Accept.BackColor = $ButtonBackColor
-$bt_Accept.ForeColor = $ButtonForeColor
-$bt_Accept.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Accept.Text = $Txt_List.bt_Accept
-$bt_Accept.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-$bt_Accept.Cursor = [System.Windows.Forms.Cursors]::Hand
-$bt_Accept.Add_Click(
-    {
-        If (Test-Path -Path $Global:Settings)
-            {
-                Remove-Item -Path $Global:Settings -Recurse -Force
-                $Parent = Split-Path -Path $Global:Settings -Parent
-                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+# ========== Form: Accept-Button ==============================
+
+$ht_Data = @{
+            Left = 20
+            Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
+            Size = $ButtonSize
+            FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+            'FlatAppearance.MouseOverBackColor' = $ButtonHoverColor
+            BackColor = $ButtonBackColor
+            ForeColor = $ButtonForeColor
+            Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
+            Text = $Txt_List.bt_Accept
+            TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+            Cursor = [System.Windows.Forms.Cursors]::Hand
+            Visible = $true
+            }
+
+$ar_Events = @(
+                {Add_Click(
                     {
-                        Remove-Item -Path $Parent -Recurse -Force
+                        If (Test-Path -Path $Global:Settings)
+                            {
+                                Remove-Item -Path $Global:Settings -Recurse -Force
+                                $Parent = Split-Path -Path $Global:Settings -Parent
+                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                                    {
+                                        Remove-Item -Path $Parent -Recurse -Force
+                                    }
+                            }
+
+                        If (Test-Path -Path $Global:Path)
+                            {
+                                $Parent = Split-Path -Path $Global:Path -Parent
+                                Remove-Item -Path $Parent -Recurse -Force
+                                $Parent = Split-Path -Path $Parent -Parent
+                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                                    {
+                                        Remove-Item -Path $Parent -Recurse -Force
+                                    }
+                            }
+
+                        If (Test-Path -Path $Global:Desktop)
+                            {
+                                Remove-Item -Path $Global:Desktop -Force
+                            }
+
+                        If (Test-Path -Path $Global:StartMenu)
+                            {
+                                Remove-Item -Path $Global:StartMenu -Recurse -Force
+                                $Parent = Split-Path -Path $Global:StartMenu -Parent
+                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                                    {
+                                        Remove-Item -Path $Parent -Recurse -Force
+                                    }
+                            }
+
+                        $Label.Text = $Txt_List.Label1
+                        $bt_Accept.Visible = $false
+                        $bt_Cancel.Visible = $false
+                        $bt_Exit.Visible = $true
                     }
-            }
+                )}
+              )
 
-        If (Test-Path -Path $Global:Path)
-            {
-                $Parent = Split-Path -Path $Global:Path -Parent
-                Remove-Item -Path $Parent -Recurse -Force
-                $Parent = Split-Path -Path $Parent -Parent
-                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
-                    {
-                        Remove-Item -Path $Parent -Recurse -Force
-                    }
-            }
+Create-Object -Name bt_Accept -Type Button -Data $ht_Data -Events $ar_Events -Control Form
 
-        If (Test-Path -Path $Global:Desktop)
-            {
-                Remove-Item -Path $Global:Desktop -Force
-            }
+# ========== Form: Cancel-Button ==============================
 
-        If (Test-Path -Path $Global:StartMenu)
-            {
-                Remove-Item -Path $Global:StartMenu -Recurse -Force
-                $Parent = Split-Path -Path $Global:StartMenu -Parent
-                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
-                    {
-                        Remove-Item -Path $Parent -Recurse -Force
-                    }
-            }
+$ht_Data.Left = $Form.ClientSize.Width - $ButtonSize.Width - 20
+$ht_Data.Text = $Txt_List.bt_Cancel
 
-        $Label.Text = $Txt_List.Label1
-        $bt_Accept.Visible = $false
-        $bt_Cancel.Visible = $false
-        $bt_Exit.Visible = $true
-    }
-)
+$ar_Events = @({Add_Click({$Form.Close()})})
 
-# ========== Cancel-Button ====================================
+Create-Object -Name bt_Cancel -Type Button -Data $ht_Data -Events $ar_Events -Control Form
 
-$bt_Cancel = New-Object -TypeName System.Windows.Forms.Button
-$bt_Cancel.Left = $Form.ClientSize.Width - $ButtonSize.Width - 20
-$bt_Cancel.Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
-$bt_Cancel.Size = $ButtonSize
-$bt_Cancel.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-$bt_Cancel.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
-$bt_Cancel.BackColor = $ButtonBackColor
-$bt_Cancel.ForeColor = $ButtonForeColor
-$bt_Cancel.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Cancel.Text = $Txt_List.bt_Cancel
-$bt_Cancel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-$bt_Cancel.Cursor = [System.Windows.Forms.Cursors]::Hand
-$bt_Cancel.Add_Click(
-    {
-        $Form.Close()
-    }
-)
+# ========== Form: Exit-Button ================================
 
-# ========== Exit-Button ======================================
+$ht_Data.Left = $Form.ClientSize.Width / 2 - $ButtonSize.Width / 2
+$ht_Data.Text = $Txt_List.bt_Exit
+$ht_Data.Visible = $false
 
-$bt_Exit = New-Object -TypeName System.Windows.Forms.Button
-$bt_Exit.Left = $Form.ClientSize.Width / 2 - $ButtonSize.Width / 2
-$bt_Exit.Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
-$bt_Exit.Size = $ButtonSize
-$bt_Exit.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-$bt_Exit.FlatAppearance.MouseOverBackColor = $ButtonHoverColor
-$bt_Exit.BackColor = $ButtonBackColor
-$bt_Exit.ForeColor = $ButtonForeColor
-$bt_Exit.Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-$bt_Exit.Text = $Txt_List.bt_Exit
-$bt_Exit.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-$bt_Exit.Cursor = [System.Windows.Forms.Cursors]::Hand
-$bt_Exit.Visible = $false
-$bt_Exit.Add_Click(
-    {
-        $Form.Close()
-    }
-)
-
-# ========== Add-Controls =====================================
-
-$Form.Controls.AddRange(@($Label, $bt_Accept, $bt_Cancel, $bt_Exit))
+Create-Object -Name bt_Exit -Type Button -Data $ht_Data -Events $ar_Events -Control Form
 
 # ========== Start ============================================
 

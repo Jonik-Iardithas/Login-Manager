@@ -615,9 +615,9 @@ $ar_Events = @(
                                         $Data = [array]($Data | Sort-Object -Property ID)
                                         If ($Data.Count -eq 0) {$New_ID = ('{0:d4}' -f 0)}
                                         Else {$New_ID = ('{0:d4}' -f ([int]($Data[-1].ID) + 1))}
-                                        If ($tb_URL.TextLength -eq 0) {$tb_URL.Text = "N/A"}
+                                        If ($tb_URL.TextLength      -eq 0) {$tb_URL.Text      = "N/A"}
                                         If ($tb_UserName.TextLength -eq 0) {$tb_UserName.Text = "N/A"}
-                                        If ($tb_Email.TextLength -eq 0) {$tb_Email.Text = "N/A"}
+                                        If ($tb_Email.TextLength    -eq 0) {$tb_Email.Text    = "N/A"}
                                         If ($tb_Metadata.TextLength -eq 0) {$tb_Metadata.Text = "N/A"}
                                         $Data += @([PSCustomObject]@{
                                                                     ID       = $New_ID
@@ -661,9 +661,9 @@ $ar_Events = @(
                                             {
                                                 $Data = [array](Get-Content -Path $Paths.LoginFile | ConvertFrom-Json)
                                                 $Data = [array]($Data | Sort-Object -Property ID)
-                                                If ($tb_URL.TextLength -eq 0) {$tb_URL.Text = "N/A"}
+                                                If ($tb_URL.TextLength      -eq 0) {$tb_URL.Text      = "N/A"}
                                                 If ($tb_UserName.TextLength -eq 0) {$tb_UserName.Text = "N/A"}
-                                                If ($tb_Email.TextLength -eq 0) {$tb_Email.Text = "N/A"}
+                                                If ($tb_Email.TextLength    -eq 0) {$tb_Email.Text    = "N/A"}
                                                 If ($tb_Metadata.TextLength -eq 0) {$tb_Metadata.Text = "N/A"}
                                                 $Data[$Data.ID.IndexOf($Global:ID)].URL      = Crypt-Text -Mode Encrypt -Format Text -Text $tb_URL.Text      -Key $Global:MPW
                                                 $Data[$Data.ID.IndexOf($Global:ID)].UserName = Crypt-Text -Mode Encrypt -Format Text -Text $tb_UserName.Text -Key $Global:MPW
@@ -1728,7 +1728,7 @@ $ar_Events = @(
 Create-Object -Name bt_Chars_Plus -Type Button -Data $ht_Data -Events $ar_Events -Control pn_Exclusions
 
 # =============================================================
-# ========== Show Dialog ======================================
+# ========== Start ============================================
 # =============================================================
 
 $Form.ShowDialog()
