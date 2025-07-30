@@ -23,8 +23,7 @@ $ButtonSize = [System.Drawing.Size]::new(120,28)
 $ButtonBackColor = [System.Drawing.Color]::Bisque
 $ButtonForeColor = [System.Drawing.Color]::MidnightBlue
 $ButtonHoverColor = [System.Drawing.Color]::LightYellow
-$Global:Settings = "$env:LOCALAPPDATA\PowerShellTools\Login-Manager"
-$Global:Path = "$PSScriptRoot\Login-Manager.ps1"
+$Global:Settings = "$env:LOCALAPPDATA\PowerShellTools\Login-Manager\Settings.ini"
 $Global:Desktop = "$env:USERPROFILE\Desktop\Login-Manager.lnk"
 $Global:StartMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager"
 
@@ -43,6 +42,26 @@ $MB_List = @{
 }
 
 # ========== Functions ========================================
+
+function Initialize-Me ([string]$FilePath)
+    {
+        If (!(Test-Path -Path $FilePath))
+            {
+                [System.Windows.Forms.MessageBox]::Show(($MB_List.Ini_01 -f $FilePath),$MB_List.Ini_02,0)
+                Exit
+            }
+
+        $Data = [array](Get-Content -Path $FilePath)
+
+        ForEach ($i in $Data)
+            {
+                $ht_Result += @{$i.Split("=")[0].Trim() = $i.Split("=")[-1].Trim()}
+            }
+
+        return $ht_Result
+    }
+
+# -------------------------------------------------------------
 
 function Create-Object ([string]$Name, [string]$Type, [HashTable]$Data, [array]$Events, [string]$Control)
     {
@@ -64,13 +83,9 @@ function Create-Object ([string]$Name, [string]$Type, [HashTable]$Data, [array]$
             }
     }
 
-# ========== Self-Test ========================================
+# ========== Code =============================================
 
-If (!(Test-Path -Path $Global:Path))
-    {
-        [System.Windows.Forms.MessageBox]::Show(($MB_list.Ini_01 -f $Global:Path),$MB_list.Ini_02,0)
-        Exit
-    }
+$Paths = Initialize-Me -FilePath $Global:Settings
 
 # ========== Form =============================================
 
@@ -126,17 +141,18 @@ $ar_Events = @(
                     {
                         If (Test-Path -Path $Global:Settings)
                             {
-                                Remove-Item -Path $Global:Settings -Recurse -Force
                                 $Parent = Split-Path -Path $Global:Settings -Parent
+                                Remove-Item -Path $Parent -Recurse -Force
+                                $Parent = Split-Path -Path $Parent -Parent
                                 If (!(Get-Item -Path $Parent).GetFileSystemInfos())
                                     {
                                         Remove-Item -Path $Parent -Recurse -Force
                                     }
                             }
 
-                        If (Test-Path -Path $Global:Path)
+                        If (Test-Path -Path $Paths.IconFolder)
                             {
-                                $Parent = Split-Path -Path $Global:Path -Parent
+                                $Parent = Split-Path -Path $Paths.IconFolder -Parent
                                 Remove-Item -Path $Parent -Recurse -Force
                                 $Parent = Split-Path -Path $Parent -Parent
                                 If (!(Get-Item -Path $Parent).GetFileSystemInfos())

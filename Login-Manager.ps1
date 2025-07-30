@@ -91,14 +91,14 @@ $Txt_List = @{
     bt_Chars_Plus     = "{0} Zeichen"
 }
 
-$Tooltips_List = @{
+$TT_List = @{
     Copy  = "Klicken um Inhalt in die Zwischenablage zu kopieren."
     Reset = "Klicken um Timer zurückzusetzen."
 }
 
-$MessageBoxes_List = @{
-    Initialize_Msg_01 = "Konnte Datei {0} nicht finden."
-    Initialize_Msg_02 = "Login-Manager: Fehler"
+$MB_List = @{
+    Ini_01 = "Konnte Datei {0} nicht finden."
+    Ini_02 = "Login-Manager: Fehler"
 }
 
 $Icons_List = @{
@@ -138,7 +138,7 @@ function Initialize-Me ([string]$FilePath)
     {
         If (!(Test-Path -Path $FilePath))
             {
-                [System.Windows.Forms.MessageBox]::Show(($MessageBoxes_List.Initialize_Msg_01 -f $FilePath),$MessageBoxes_List.Initialize_Msg_02,0)
+                [System.Windows.Forms.MessageBox]::Show(($MB_List.Ini_01 -f $FilePath),$MB_List.Ini_02,0)
                 Exit
             }
 
@@ -286,9 +286,20 @@ function Create-Object ([string]$Name, [string]$Type, [HashTable]$Data, [array]$
     {
         New-Variable -Name $Name -Value (New-Object -TypeName System.Windows.Forms.$Type) -Scope Global -Force
 
-        ForEach ($k in $Data.Keys) {Invoke-Expression ("`$$Name.$k = " + {$Data.$k})}
-        ForEach ($e in $Events)    {Invoke-Expression ("`$$Name.$e")}
-        If ($Control)              {Invoke-Expression ("`$$Control.Controls.Add(`$$Name)")}
+        ForEach ($k in $Data.Keys)
+            {
+                Invoke-Expression -Command ("`$$Name.$k = " + {$Data.$k})
+            }
+
+        ForEach ($i in $Events)
+            {
+                Invoke-Expression -Command ("`$$Name.$i")
+            }
+
+        If ($Control)
+            {
+                Invoke-Expression -Command ("`$$Control.Controls.Add(`$$Name)")
+            }
     }
 
 # -------------------------------------------------------------
@@ -779,7 +790,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
+                        $Tooltip.SetToolTip($this,$TT_List.Copy)
                     })}
               )
 
@@ -1018,7 +1029,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,$Tooltips_List.Reset)
+                        $Tooltip.SetToolTip($this,$TT_List.Reset)
                     })}
                 )
 
@@ -1427,7 +1438,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
+                        $Tooltip.SetToolTip($this,$TT_List.Copy)
                     })}
               )
 
@@ -1599,7 +1610,7 @@ $ar_Events = @(
                     })}
                 {Add_MouseHover(
                     {
-                        $Tooltip.SetToolTip($this,$Tooltips_List.Copy)
+                        $Tooltip.SetToolTip($this,$TT_List.Copy)
                     })}
               )
 
