@@ -196,11 +196,11 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
             {
                 If ($Format -in 'Text')
                     {
-                        $Plain = [System.Text.Encoding]::UTF8.GetBytes($Text)
+                        $Plain = [System.Text.Encoding]::UTF8.GetBytes($Text + [char]0xFF)
                     }
                 ElseIf ($Format -in 'Hex')
                     {
-                        $Plain = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::Parse($Text).Value
+                        $Plain = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::Parse($Text + "FF").Value
                     }
 
                 $Encryptor = $AES.CreateEncryptor()
@@ -233,11 +233,13 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
 
                 If ($Format -in 'Text')
                     {
-                        $Output = [System.Text.Encoding]::UTF8.GetString($Decrypted).Trim([char]0)
+                        $Output = [System.Text.Encoding]::UTF8.GetString($Decrypted).TrimEnd([char]0)
+                        $Output = $Output.Substring(0,($Output.Length - 1))
                     }
                 ElseIf ($Format -in 'Hex')
                     {
-                        $Output = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted.Where({$_ -ne [char]0})).ToString()
+                        $Output = [System.Runtime.Remoting.Metadata.W3cXsd2001.SoapHexBinary]::new($Decrypted).ToString().TrimEnd("0")
+                        $Output = $Output.Substring(0,($Output.Length - 2))
                     }
             }
 
@@ -251,24 +253,25 @@ function Crypt-Text ([string]$Mode, [string]$Format, [string]$Text, [string]$Key
 
 function Verify-MPW ([string]$PW)
     {
+        $SHA = New-Object -TypeName System.Security.Cryptography.SHA256Managed
+
         $Data = Get-Content -Path $Paths.UserDataFile -Raw
 
         If ($Data)
             {
-                $UserData = Crypt-Text -Mode Decrypt -Format Hex -Text $Data -Key $PW
-                $PWByteArray = [System.Text.Encoding]::UTF8.GetBytes($PW)
+                $PWByteArray = $SHA.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($PW))
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
                 $PWHexString = [System.BitConverter]::ToString($PWByteArray).Replace("-",[string]::Empty)
+                $UserData = Crypt-Text -Mode Decrypt -Format Hex -Text $Data -Key $PW
                 $Pos = $Sum % ($UserData.Length - $PWHexString.Length)
-                return $UserData.IndexOf($PWHexString) -eq $Pos
             }
         Else
             {
                 $Randomizer = [System.Security.Cryptography.RandomNumberGenerator]::Create()
                 $Buffer = [byte[]]::new((Get-Random -InputObject @(512..1024)))
-                $Randomizer.GetNonZeroBytes($Buffer)
+                $Randomizer.GetBytes($Buffer)
                 $UserData = [System.BitConverter]::ToString($Buffer).Replace("-",[string]::Empty)
-                $PWByteArray = [System.Text.Encoding]::UTF8.GetBytes($PW)
+                $PWByteArray = $SHA.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($PW))
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
                 $PWHexString = [System.BitConverter]::ToString($PWByteArray).Replace("-",[string]::Empty)
                 $Pos = $Sum % $UserData.Length
@@ -276,8 +279,11 @@ function Verify-MPW ([string]$PW)
                 $Data = Crypt-Text -Mode Encrypt -Format Hex -Text $UserData -Key $PW
                 Set-Content -Value $Data -Path $Paths.UserDataFile -NoNewline
                 $Randomizer.Dispose()
-                return $true
             }
+
+        $SHA.Dispose()
+
+        return $UserData.IndexOf($PWHexString) -eq $Pos
     }
 
 # -------------------------------------------------------------
