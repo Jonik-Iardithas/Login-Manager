@@ -259,10 +259,10 @@ function Verify-MPW ([string]$PW)
 
         If ($Data)
             {
+                $UserData = Crypt-Text -Mode Decrypt -Format Hex -Text $Data -Key $PW
                 $PWByteArray = $SHA.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($PW))
                 $Sum = ($PWByteArray | Measure-Object -Sum).Sum
                 $PWHexString = [System.BitConverter]::ToString($PWByteArray).Replace("-",[string]::Empty)
-                $UserData = Crypt-Text -Mode Decrypt -Format Hex -Text $Data -Key $PW
                 $Pos = $Sum % ($UserData.Length - $PWHexString.Length)
             }
         Else
