@@ -9,13 +9,13 @@ If (!([System.Security.Principal.WindowsPrincipal][System.Security.Principal.Win
 [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms") | Out-Null
 [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing") | Out-Null
 [System.Windows.Forms.Application]::EnableVisualStyles()
-[System.Drawing.FontFamily]::Families | ForEach-Object {$Fonts += @($_)}
 
 # ========== Variables ========================================
 
 $FormSize = [System.Drawing.Size]::new(420,240)
 $FormBackColor = [System.Drawing.Color]::Honeydew
 $FormForeColor = [System.Drawing.Color]::MidnightBlue
+$Fonts = [System.Drawing.FontFamily]::Families
 $FontIndex = $Fonts.Name.IndexOf('Verdana')
 $FontSize = 9
 $FontStyle = [System.Drawing.FontStyle]::Regular
@@ -90,16 +90,16 @@ $Paths = Initialize-Me -FilePath $Global:Settings
 # ========== Form =============================================
 
 $ht_Data = @{
-            ClientSize = $FormSize
-            StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
-            Text = $Txt_List.Form
-            Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSHOME\powershell.exe")
-            BackColor = $FormBackColor
-            ForeColor = $FormForeColor
-            FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
-            MaximizeBox = $false
-            MinimizeBox = $false
-            }
+    ClientSize = $FormSize
+    StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen
+    Text = $Txt_List.Form
+    Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSHOME\powershell.exe")
+    BackColor = $FormBackColor
+    ForeColor = $FormForeColor
+    FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
+    MaximizeBox = $false
+    MinimizeBox = $false
+}
 
 $ar_Events = @({Add_Load({$this.ActiveControl = $bt_Cancel})})
 
@@ -108,81 +108,81 @@ Create-Object -Name Form -Type Form -Data $ht_Data -Events $ar_Events
 # ========== Form: Label ======================================
 
 $ht_Data = @{
-            Left = 20
-            Top = 20
-            Width = $Form.ClientSize.Width - 40
-            Height = 50
-            Text = $Txt_List.Label0
-            Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, ($FontSize + 1), $FontStyle)
-            TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-            }
+    Left = 20
+    Top = 20
+    Width = $Form.ClientSize.Width - 40
+    Height = 50
+    Text = $Txt_List.Label0
+    Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, ($FontSize + 1), $FontStyle)
+    TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+}
 
 Create-Object -Name Label -Type Label -Data $ht_Data -Control Form
 
 # ========== Form: Accept-Button ==============================
 
 $ht_Data = @{
-            Left = 20
-            Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
-            Size = $ButtonSize
-            FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
-            'FlatAppearance.MouseOverBackColor' = $ButtonHoverColor
-            BackColor = $ButtonBackColor
-            ForeColor = $ButtonForeColor
-            Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
-            Text = $Txt_List.bt_Accept
-            TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
-            Cursor = [System.Windows.Forms.Cursors]::Hand
-            Visible = $true
-            }
+    Left = 20
+    Top = $Form.ClientSize.Height - $ButtonSize.Height - 10
+    Size = $ButtonSize
+    FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    'FlatAppearance.MouseOverBackColor' = $ButtonHoverColor
+    BackColor = $ButtonBackColor
+    ForeColor = $ButtonForeColor
+    Font = New-Object -TypeName System.Drawing.Font($Fonts[$FontIndex].Name, $FontSize, $FontStyle)
+    Text = $Txt_List.bt_Accept
+    TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    Cursor = [System.Windows.Forms.Cursors]::Hand
+    Visible = $true
+}
 
 $ar_Events = @(
-                {Add_Click(
-                    {
-                        If (Test-Path -Path $Global:Settings)
-                            {
-                                $Parent = Split-Path -Path $Global:Settings -Parent
-                                Remove-Item -Path $Parent -Recurse -Force
-                                $Parent = Split-Path -Path $Parent -Parent
-                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
-                                    {
-                                        Remove-Item -Path $Parent -Recurse -Force
-                                    }
-                            }
+    {Add_Click(
+        {
+            If (Test-Path -Path $Global:Settings)
+                {
+                    $Parent = Split-Path -Path $Global:Settings -Parent
+                    Remove-Item -Path $Parent -Recurse -Force
+                    $Parent = Split-Path -Path $Parent -Parent
+                    If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                        {
+                            Remove-Item -Path $Parent -Recurse -Force
+                        }
+                }
 
-                        If (Test-Path -Path $Paths.IconFolder)
-                            {
-                                $Parent = Split-Path -Path $Paths.IconFolder -Parent
-                                Remove-Item -Path $Parent -Recurse -Force
-                                $Parent = Split-Path -Path $Parent -Parent
-                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
-                                    {
-                                        Remove-Item -Path $Parent -Recurse -Force
-                                    }
-                            }
+            If (Test-Path -Path $Paths.IconFolder)
+                {
+                    $Parent = Split-Path -Path $Paths.IconFolder -Parent
+                    Remove-Item -Path $Parent -Recurse -Force
+                    $Parent = Split-Path -Path $Parent -Parent
+                    If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                        {
+                            Remove-Item -Path $Parent -Recurse -Force
+                        }
+                }
 
-                        If (Test-Path -Path $Global:Desktop)
-                            {
-                                Remove-Item -Path $Global:Desktop -Force
-                            }
+            If (Test-Path -Path $Global:Desktop)
+                {
+                    Remove-Item -Path $Global:Desktop -Force
+                }
 
-                        If (Test-Path -Path $Global:StartMenu)
-                            {
-                                Remove-Item -Path $Global:StartMenu -Recurse -Force
-                                $Parent = Split-Path -Path $Global:StartMenu -Parent
-                                If (!(Get-Item -Path $Parent).GetFileSystemInfos())
-                                    {
-                                        Remove-Item -Path $Parent -Recurse -Force
-                                    }
-                            }
+            If (Test-Path -Path $Global:StartMenu)
+                {
+                    Remove-Item -Path $Global:StartMenu -Recurse -Force
+                    $Parent = Split-Path -Path $Global:StartMenu -Parent
+                    If (!(Get-Item -Path $Parent).GetFileSystemInfos())
+                        {
+                            Remove-Item -Path $Parent -Recurse -Force
+                        }
+                }
 
-                        $Label.Text = $Txt_List.Label1
-                        $bt_Accept.Visible = $false
-                        $bt_Cancel.Visible = $false
-                        $bt_Exit.Visible = $true
-                    }
-                )}
-              )
+            $Label.Text = $Txt_List.Label1
+            $bt_Accept.Visible = $false
+            $bt_Cancel.Visible = $false
+            $bt_Exit.Visible = $true
+        }
+    )}
+)
 
 Create-Object -Name bt_Accept -Type Button -Data $ht_Data -Events $ar_Events -Control Form
 
