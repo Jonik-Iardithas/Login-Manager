@@ -78,8 +78,8 @@ Ordner mit Icons und Skript-Dateien:
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Open_TB.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Plain.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Prev.png`\
-`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator.png`
-`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator_TB.png`
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator_TB.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Reset_TB.png`
 
 ---
