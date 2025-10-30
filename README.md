@@ -1,3 +1,10 @@
+**Update 30.10.2025:**
+
+• Der Login-Manager verfügt nun über ein alternatives Layout, welches in der INI aktiviert werden kann (siehe Screenshots).\
+• Es wurden Verknüpfungen zu wichtigen Programmdateien eingebaut, unter anderem zur INI-Datei, so dass mühsames Browsen im Dateiexplorer zukünftig entfällt.\
+• Es besteht nun die Möglichkeit, ein einmal eingegebenes Master-Passwort zu ändern.\
+• Es wurden zahlreiche kleine Verbesserungen im Sinne der Benutzerfreundlichkeit vorgenommen.
+
 **Hallo Welt,**
 
 den Sommer 2024 verbrachte ich größtenteils mit dem Schreiben zweier Anwendungen in Powershell. Die Ideen zu diesem Projekt begleiteten mich schon eine Weile, doch erst zu dieser Zeit fand ich den passenden Einstieg. Eine Anwendung sollte die Verschlüsselung von Login-Daten zum Gegenstand haben, die andere sollte inkrementelle Backups erstellen. Ich merkte relativ bald, dass es sich bei diesen Projekten um mehr als um Skripte handelte, ganz unverhofft betrat ich das Feld der Anwendungsentwicklung. Von den Ergebnissen bin ich gänzlich überzeugt und ich persönlich nutze meine Programme seitdem täglich. Aus diesem Grund würde ich meine Arbeiten gerne mit sovielen Nutzern wie möglich teilen. Darüberhinaus können die Skripte als Referenzwerke für Powershell-Lernende dienen, sind sie doch sehr geradeaus geschrieben.
