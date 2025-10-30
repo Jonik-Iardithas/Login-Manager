@@ -33,7 +33,19 @@ $Global:Path = "$env:ProgramFiles\PowerShellTools\Login-Manager"
 $Global:Desktop = "$env:USERPROFILE\Desktop\Login-Manager.lnk"
 $Global:StartMenu = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk"
 $Global:Uninstall = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk"
-$Global:Content = @("LoginFile = $Global:AppDir\Logins.json", "UserDataFile = $Global:AppDir\UserData.dat", "IconFolder = $Global:Path\Icons\")
+
+$Global:Content = @(
+    "[Paths]"
+    ";**Paths to Files and Folders"
+    "LoginFile = $Global:AppDir\Logins.json"
+    "UserDataFile = $Global:AppDir\UserData.dat"
+    "IconFolder = $Global:Path\Icons\"
+    [string]::Empty
+    "[Options]"
+    ";**(Standard or Toolbar)"
+    "Layout = Standard"
+    "Seconds = 900"
+)
 
 $Txt_List = @{
     Form       = "Installer für Login-Manager"
@@ -361,7 +373,18 @@ $ar_Events = @(
                 {
                     $Global:Path = $Folder.SelectedPath
                     $this.Text = $Global:Path
-                    $Global:Content = @("LoginFile = $Global:AppDir\Logins.json", "UserDataFile = $Global:AppDir\UserData.dat", "IconFolder = $Global:Path\Icons\")
+                    $Global:Content = @(
+                        "[Paths]"
+                        ";**Paths to Files and Folders"
+                        "LoginFile = $Global:AppDir\Logins.json"
+                        "UserDataFile = $Global:AppDir\UserData.dat"
+                        "IconFolder = $Global:Path\Icons\"
+                        [string]::Empty
+                        "[Options]"
+                        ";**(Standard or Toolbar)"
+                        "Layout = Standard"
+                        "Seconds = 900"
+                    )
                 }
         }
     )}
