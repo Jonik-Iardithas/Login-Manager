@@ -19,8 +19,7 @@ Beide Anwendungen erfordern eine gewisse Dateistruktur um zu laufen, weshalb ich
 
 Um dem Ganzen einen etwas ästhetischeren Look zu verpassen, habe ich optionale Icons beigefügt, die während des Installationsprozesses nach Wunsch mitkopiert werden können. Das Icon-Verzeichnis findet sich standardmäßig unter
 
-`C:\Program Files\PowerShellTools\Login-Manager\Icons`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons`
+`C:\Program Files\PowerShellTools\Login-Manager\Icons`
 
 **Installationsanleitung:**
 
@@ -36,37 +35,20 @@ Folgende Dateien werden beim Installationsvorgang erstellt bzw. kopiert:
 
 Ini-Dateien:
 
-`C:\Users\%username%\AppData\Local\PowerShellTools\Backup-Maker\Settings.ini`\
 `C:\Users\%username%\AppData\Local\PowerShellTools\Login-Manager\Settings.ini`
 
 Verknüpfungen (optional):
 
-`C:\Users\%username%\Desktop\Backup-Maker.lnk`\
-`C:\Users\%username%\Desktop\Login-Manager.lnk`
-
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Backup-Maker.lnk`\
-`C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Backup-Maker\Uninstall (Backup-Maker).lnk`
-
+`C:\Users\%username%\Desktop\Login-Manager.lnk`\
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Login-Manager.lnk`\
 `C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\PowerShellTools\Login-Manager\Uninstall (Login-Manager).lnk`
 
 Ordner mit Icons und Skript-Dateien:
 
-`C:\Program Files\PowerShellTools\Backup-Maker`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Backup-Maker.ps1`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Uninstall.ps1`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Backup-Maker.ico`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Copy.ico`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_NewFolder.ico`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Remove.ico`\
-`C:\Program Files\PowerShellTools\Backup-Maker\Icons\Icon_Replace.ico`
-
 `C:\Program Files\PowerShellTools\Login-Manager`\
 `C:\Program Files\PowerShellTools\Login-Manager\Login-Manager.ps1`\
 `C:\Program Files\PowerShellTools\Login-Manager\Uninstall.ps1`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons`\
-`C:\Program Files\PowerShellTools\Login-Manager\Icons\Login-Manager.ico`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Add.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Close.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_CMI_Open.png`\
@@ -88,7 +70,8 @@ Ordner mit Icons und Skript-Dateien:
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Prev.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_PW_Generator_TB.png`\
-`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Reset_TB.png`
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Reset_TB.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Login-Manager.ico`
 
 ---
 
@@ -97,5 +80,3 @@ Ordner mit Icons und Skript-Dateien:
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Login-Manager_TB.png)
 <br>
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Settings_TB.png)
-<br>
-![Backup-Maker_Screenshot](https://github.com/Jonik-Iardithas/Backup-Maker/blob/main/Img/Backup-Maker.png)
