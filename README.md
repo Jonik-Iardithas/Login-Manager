@@ -69,6 +69,7 @@ Ordner mit Icons und Skript-Dateien:
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Login-Manager.ico`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Add.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Close.png`\
+`C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_CMI_Open.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Del.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Edit.png`\
 `C:\Program Files\PowerShellTools\Login-Manager\Icons\Icon_Enter.png`\
