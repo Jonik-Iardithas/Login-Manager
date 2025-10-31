@@ -35,8 +35,6 @@ $Global:ID = $null
 $Global:Result = $null
 $Global:Index = $null
 $Global:MPW = $null
-$L_Ptr = [System.IntPtr]::new(0)
-$S_Ptr = [System.IntPtr]::new(0)
 $SyncHash = [HashTable]::Synchronized(@{})
 $RSList = @("Timer")
 
@@ -137,6 +135,7 @@ $Icons_List = @{
     Metadata_TB     = "$env:windir\system32\imageres.dll,287,20,20"
     MPW_Change_TB   = "$env:windir\system32\imageres.dll,320,20,20"
     Reset_TB        = "$env:windir\system32\shell32.dll,239,20,20"
+    CMI_Open        = "$env:windir\system32\shell32.dll,70,20,20"
 }
 
 # =============================================================
@@ -613,16 +612,9 @@ Create-Object -Name pn_Toolbar -Type Panel -Data $ht_Data -Control Form
 # ========== OpenFilesContextMenu =============================
 # =============================================================
 
-[Win32Functions.WinAPI]::ExtractIconEx("$env:windir\system32\shell32.dll", 310, [ref]$L_Ptr, [ref]$S_Ptr, 1) | Out-Null
-$CMI_Image = ([System.Drawing.Icon]::FromHandle($S_Ptr)).Clone()
-[Win32Functions.WinApi]::DestroyIcon($L_Ptr) | Out-Null
-[Win32Functions.WinApi]::DestroyIcon($S_Ptr) | Out-Null
-
-# -------------------------------------------------------------
-
 $ht_Data = @{
     Text = $Txt_List.CMI_Logins
-    Image = $CMI_Image
+    Image = $Icons.CMI_Open
 }
 
 $ar_Events = @(
