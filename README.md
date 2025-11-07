@@ -85,5 +85,5 @@ Ordner mit Icons und Skript-Dateien:
 *Logins.json:*\
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Logins.png)
 <br>
-*UserData.dat (Master-Password-Datei):*\
+*UserData.dat (Master-Passwort-Datei):*\
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/UserData.png)
