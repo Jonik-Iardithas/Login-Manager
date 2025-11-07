@@ -80,3 +80,7 @@ Ordner mit Icons und Skript-Dateien:
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Login-Manager_TB.png)
 <br>
 ![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Settings_TB.png)
+<br>
+![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/Logins.png)
+<br>
+![Login-Manager_Screenshot](https://github.com/Jonik-Iardithas/Login-Manager/blob/main/Img/UserData.png)
