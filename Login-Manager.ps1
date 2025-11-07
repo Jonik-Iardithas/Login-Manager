@@ -432,11 +432,11 @@ function Load-Result ([string]$Msg_A, [string]$Msg_B)
 
                 $Global:ID = $Global:Result[$Global:Index].ID
 
-                $tb_r_URL.Text      = $Global:Result[$Global:Index].URL
-                $tb_r_UserName.Text = $Global:Result[$Global:Index].UserName
-                $tb_r_Email.Text    = $Global:Result[$Global:Index].Email
-                $tb_r_Password.Text = $Global:Result[$Global:Index].Password
-                $tb_r_Metadata.Text = $Global:Result[$Global:Index].Metadata
+                $tb_r_URL.Text      = Crypt-Text -Mode Decrypt -Format Text -Text ($Global:Result[$Global:Index].URL)      -Key $Global:MPW
+                $tb_r_UserName.Text = Crypt-Text -Mode Decrypt -Format Text -Text ($Global:Result[$Global:Index].UserName) -Key $Global:MPW
+                $tb_r_Email.Text    = Crypt-Text -Mode Decrypt -Format Text -Text ($Global:Result[$Global:Index].Email)    -Key $Global:MPW
+                $tb_r_Password.Text = $Global:Result[$Global:Index].Password.Substring(0,16)
+                $tb_r_Metadata.Text = Crypt-Text -Mode Decrypt -Format Text -Text ($Global:Result[$Global:Index].Metadata) -Key $Global:MPW
 
                 $lb_Page.Text       = [string](($Global:Index + 1), "/", $Global:Result.Count)
 
@@ -577,6 +577,7 @@ $ar_Events = @(
     )}
     {Add_FormClosing(
         {
+            Remove-Variable -Name MPW -Scope Global -Force
             Set-Clipboard -Value $null
 
             $RS = Get-Runspace -Name $RSList
@@ -951,11 +952,11 @@ $ar_Events = @(
                                     $Data[$Data.ID.IndexOf($Global:ID)].Password = Crypt-Text -Mode Encrypt -Format Text -Text $tb_Password.Text -Key $Global:MPW
                                     $Data[$Data.ID.IndexOf($Global:ID)].Metadata = Crypt-Text -Mode Encrypt -Format Text -Text $tb_Metadata.Text -Key $Global:MPW
                                     $Data | ConvertTo-Json -depth 1 | Set-Content -Path $Ini.LoginFile
-                                    $Global:Result[$Global:Index].URL      = $tb_URL.Text
-                                    $Global:Result[$Global:Index].UserName = $tb_UserName.Text
-                                    $Global:Result[$Global:Index].Email    = $tb_Email.Text
-                                    $Global:Result[$Global:Index].Password = $tb_Password.Text
-                                    $Global:Result[$Global:Index].Metadata = $tb_Metadata.Text
+                                    $Global:Result[$Global:Index].URL      = $Data[$Data.ID.IndexOf($Global:ID)].URL
+                                    $Global:Result[$Global:Index].UserName = $Data[$Data.ID.IndexOf($Global:ID)].UserName
+                                    $Global:Result[$Global:Index].Email    = $Data[$Data.ID.IndexOf($Global:ID)].Email
+                                    $Global:Result[$Global:Index].Password = $Data[$Data.ID.IndexOf($Global:ID)].Password
+                                    $Global:Result[$Global:Index].Metadata = $Data[$Data.ID.IndexOf($Global:ID)].Metadata
                                     Load-Result -Msg_A $Msg_List.NewEdit -Msg_B $Msg_List.NewEdit
                                     Clear-Boxes
                                 }
@@ -1006,8 +1007,12 @@ $ar_Events = @(
                     If ($tb_Email.TextLength    -gt 0) { $Data = [array]($Data | Where-Object {$_.Email    -match [regex]::Escape($tb_Email.Text)   }) }
                     If ($tb_Password.TextLength -gt 0) { $Data = [array]($Data | Where-Object {$_.Password -match [regex]::Escape($tb_Password.Text)}) }
 
-                    $Global:Result = $Data
+                    $All = [array](Get-Content -Path $Ini.LoginFile | ConvertFrom-Json)
+                    $All = [array]($All | Sort-Object -Property ID)
+
+                    $Global:Result = [array]($All | Where-Object {$_.ID -in $Data.ID})
                     $Global:Index = 0
+
                     Load-Result -Msg_A $Msg_List.NewFind -Msg_B $Msg_List.NoFind
                     Clear-Boxes
                 }
@@ -1088,6 +1093,13 @@ Create-Object -Name tb_r_Email -Type TextBox -Data $ht_Data -Events $ar_Events -
 $ht_Data.Top += 30
 $ht_Data.Text = $Txt_List.tb_r_Password
 
+$ar_Events[0] = {Add_Click(
+    {
+        Set-Clipboard -Value (Crypt-Text -Mode Decrypt -Format Text -Text $Global:Result[$Global:Index].Password -Key $Global:MPW)
+        Write-Msg -TextBox $tb_Events -NL $true -Time $true -Msg $Msg_List.CopyClipboard
+    }
+)}
+
 Create-Object -Name tb_r_Password -Type TextBox -Data $ht_Data -Events $ar_Events -Control Form
 
 # =============================================================
@@ -1137,7 +1149,7 @@ $ar_Events = @(
                             $Data = [array](Get-Content -Path $Ini.LoginFile | ConvertFrom-Json)
                             $Data = [array]($Data | Sort-Object -Property ID)
                             $Data = [array]($Data | Where-Object {$_.ID -ne $Global:ID})
-                            Clear-Content -Path $Ini.LoginFile
+                            Clear-Content -Path $Ini.LoginFile -Force
                             $Data | ConvertTo-Json -depth 1 | Set-Content -Path $Ini.LoginFile
                             $Global:Result = [array]($Global:Result | Where-Object {$_.ID -ne $Global:ID})
 
